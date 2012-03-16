@@ -88,7 +88,8 @@ void FamInterface::AddPerson(int mal, int yob, int ischi, int *index, int *error
    pat.add_person(mal, 
 		  newcopy(internalPersonName[nPersons]), 
 		  0, internalError); 
-   assert(internalError==0); 
+   //removed 2012-03-16
+   //   assert(internalError==0); 
    pedset.addPerson(mal); 
    nPersons++; 
 }
@@ -107,7 +108,8 @@ void FamInterface::RemovePerson(int index, int *error)
 		     newcopy(internalPersonName[index]), 
 		     0, internalError); 
    pedset.removePerson(index); 
-   assert(!internalError); 
+   //removed 2012-03-16
+   //   assert(!internalError); 
    delete[] internalPersonName[index]; 
    for (int i=index; i<nPersons-1; i++)
    {
@@ -143,7 +145,8 @@ void FamInterface::AddFixedRelation(int parentindex,
 		  newcopy(internalPersonName[childindex]), 
 		  0, 
 		  *error); 
-   assert(*error!=1); //internal error
+   //removed 2012-03-16
+   //   assert(*error!=1); //internal error
    if (*error==0)
       pedset.addFixedRelation(parentindex, 
 			      childindex, 
@@ -541,7 +544,8 @@ void FamInterface::AddAlleleSystem(int nAll,
 		  mutationRangeMale, 
 		  0, 
 		  paterError); 
-   assert(paterError==0); //internal Error
+   //removed 2012-03-16
+   //   assert(paterError==0); //internal Error
    for (i=0; i<nAll; i++)
       pat.add_allele(newcopy(internalSystemName[nSystems]), 
 		     newcopy(internalAlleleName[nSystems][i]), 
@@ -549,7 +553,8 @@ void FamInterface::AddAlleleSystem(int nAll,
    if (hasSilentAllele) 
 	   pat.set_allele_as_silent(newcopy(internalSystemName[nSystems]), 
 			newcopy(internalAlleleName[nSystems][nAll-1]), paterError); 
-   assert(paterError==0); //internal Error
+   //removed 2012-03-16
+   //   assert(paterError==0); //internal Error
    *index = nSystems; 
    nSystems++; 
    *error = 0;
@@ -566,7 +571,8 @@ void FamInterface::RemoveAlleleSystem(int index, int *error)
    int paterError = 0; 
    pat.remove_system(newcopy(internalSystemName[index]), 
 		     0, paterError); 
-   assert(paterError==0); //internal error
+   //removed 2012-03-16
+   //   assert(paterError==0); //internal error
 
    int i; 
    delete[] internalSystemName[index]; 
@@ -684,7 +690,8 @@ void FamInterface::EditAlleleSystem(int indexSystem,
 	 pat.add_allele(newcopy(internalSystemName[indexSystem]), 
 			newcopy(internalAlleleName[indexSystem][i]), 
 			1e-30, 0, paterError); 
-   assert(paterError==0);  //internal error
+   //removed 2012-03-16
+   //   assert(paterError==0);  //internal error
    //Adjust mutation rate, and n_alleles: 
    pat.add_system(newcopy(internalSystemName[indexSystem]), 
 		  mutationRateFemale, 
@@ -695,7 +702,8 @@ void FamInterface::EditAlleleSystem(int indexSystem,
 		  mutationRangeFemale, 
 		  mutationRangeMale, 
 		  0, paterError); 
-   assert(paterError == 0); //internalError; 
+   //removed 2012-03-16
+   //   assert(paterError == 0); //internalError; 
    //finish pater update below...
    
    //Update data structure of this class:
@@ -727,7 +735,8 @@ void FamInterface::EditAlleleSystem(int indexSystem,
    if (hasSilentAllele) 
 	   pat.set_allele_as_silent(newcopy(internalSystemName[indexSystem]), 
 			newcopy(internalAlleleName[indexSystem][nAll-1]), paterError); 
-   assert(paterError == 0); //internal error. 
+   //removed 2012-03-16
+   //   assert(paterError == 0); //internal error. 
 }
 
 void FamInterface::AddDNAObservation(int indexperson, 
@@ -751,7 +760,8 @@ void FamInterface::AddDNAObservation(int indexperson,
 		newcopy(internalAlleleName[indexAlleleSystem][indexAllele1]), 
 		newcopy(internalAlleleName[indexAlleleSystem][indexAllele2]), 
 		0, paterError); 
-   assert(paterError==0); //internal error
+   //removed 2012-03-16
+   //   assert(paterError==0); //internal error
 }
 
 void FamInterface::RemoveDNAObservation(int indexperson, 
@@ -769,7 +779,8 @@ void FamInterface::RemoveDNAObservation(int indexperson,
    pat.remove_data(newcopy(internalSystemName[indexAlleleSystem]), 
 		   newcopy(internalPersonName[indexperson]), 
 		   0, paterError); 
-   assert(paterError==0); //internal error
+   //removed 2012-03-16
+   //   assert(paterError==0); //internal error
 }
 
 void FamInterface::GetProbabilities(double generationsParameter, 

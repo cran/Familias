@@ -285,7 +285,8 @@ double* Pedigree::computeProbability(pater& pat,
       sprintf(names[i], "%s%d", namePrefix, i); 
       pat.add_person(male[i], newcopy(names[i]), 0, error); 
    }
-   assert(!error); 
+   //removed 2012-03-16
+   //   assert(!error); 
    for (i=0; i<nTotal; i++)
    {
       if (mother[i] >= 0 && 
@@ -305,13 +306,15 @@ double* Pedigree::computeProbability(pater& pat,
 //	 return 0; 
 //      }
    }
-   assert(!error); 
+   //removed 2012-03-16
+   //   assert(!error); 
    if (makeCutsets)
    {
       int* prune = getCutsets(); 
       for (i=0; i<nTotal; i++)
       {
-	 assert(prune[i]!=1); 
+   //removed 2012-03-16
+	//	 assert(prune[i]!=1); 
 	 if (prune[i]==2)
 	 {
 	    pat.add_person_to_cutset(newcopy(names[i]), 0, error); 
@@ -320,14 +323,17 @@ double* Pedigree::computeProbability(pater& pat,
       }
       delete[] prune; 
    }
-   assert(!error); 
+   //removed 2012-03-16
+   //   assert(!error); 
 // Removed 2012-03-08
 //   if (info) pat.write_family(cout); 
 
    pat.execute(info, error); 
-   assert(!error); 
+   //removed 2012-03-16
+   //   assert(!error); 
    double* result = pat.getResults(0, error); 
-   assert(!error); 
+   //removed 2012-03-16
+   //   assert(!error); 
    pat.remove_cutsets(); 
    for (i=0; i<nTotal; i++)
    {
@@ -345,10 +351,12 @@ double* Pedigree::computeProbability(pater& pat,
 				    newcopy(names[i])); 
    }  
 
-   assert(!error); 
+   //removed 2012-03-16
+   //   assert(!error); 
    for (i=nNamedPersons; i<nTotal; i++)
       pat.remove_person(male[i], newcopy(names[i]), 0, error); 
-   assert(!error); 
+   //removed 2012-03-16
+   //   assert(!error); 
    for (i=0; i<nTotal; i++)
       delete[] names[i]; 
    delete[] names; 
