@@ -1,4 +1,4 @@
-3e47d5820ef21a9432439d42b9f4c7c4 *DESCRIPTION
+37a846cc9711ad1747966b185bdd2e3c *DESCRIPTION
 0cdd23e65cd1ce505c76727a4c47dbf0 *NAMESPACE
 3f28a8866af96e0c242bc1825afca58e *R/Familias.R
 1f8d25b06aa889d8342b1efb93a23c94 *R/postFamilias.R
@@ -30,7 +30,7 @@ c4f6d2f0aed7ac70288a87eb7f53a02c *man/RemovePedigree.Rd
 7c63202f5076a391403b51e7c150ea41 *man/RemovePerson.Rd
 383648060dc537c027a8389338d04fb9 *man/RemoveRelation.Rd
 59d306bb6d90eede70c1750654184ee9 *man/postFamilias.Rd
-f1ebdd3e3ccd1d4cf3272db773b5a560 *man/preFamilias.Rd
+2e058459c85473d43ad8a25b84557141 *man/preFamilias.Rd
 014103f2d5f76505623c940c2a1ffd05 *src/Element.cpp
 a96adb78e18c0349c27b09d0d38a172c *src/Element.h
 1f5e5cfd3e78f5254ba28b21a499fc63 *src/FamInterface.cpp
