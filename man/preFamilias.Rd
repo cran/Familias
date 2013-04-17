@@ -4,7 +4,7 @@
 Prepares input for GetProbabilities
 }
 \description{
-The function assumes that a \code{\link{linkdat}} object has been created using the R-package
+The function assumes that a \code{\link{paramlink}} object has been created using the R-package
 paramlink. This could be done within R or by reading files on Merlin format using
 the \code{\link{linkdat}} function of paramlink. The required calls to the \code{\link{Familias}} functions are then
 performed. This function is normally called once for each pedigree. The parameter \code{new=TRUE}
@@ -165,31 +165,31 @@ res=GetProbabilities()
 postFamilias(res,ref=2) # 
 
 # Example 5 (Exercise S11. Silent alleles)
-x1=nuclearPed(1)
-afreq1=c(0.1,0.1,0.75)
-m=marker(x1,1,c(2,2),2,c(1,1),3,c(1,1),afreq=afreq1,alleles=1:length(afreq1)) #Warning, ignore
-nn=c("AF","mother","child")
-x1=addMarker(x1,m)
-plot(x1,marker=1,id.labels=nn,title="Figure 5. Silent allele?")
-preFamilias(x1,new=TRUE,silentFrequency=0.05)
-x2=x1
-x2$pedigree[3,2]=0
-preFamilias(x2,new=FALSE)
-res=GetProbabilities()
-postFamilias(res,ref=2) # 
+# x1=nuclearPed(1)
+# afreq1=c(0.1,0.1,0.75)
+# m=marker(x1,1,c(2,2),2,c(1,1),3,c(1,1),afreq=afreq1,alleles=1:length(afreq1)) #Warning, ignore
+# nn=c("AF","mother","child")
+# x1=addMarker(x1,m)
+# plot(x1,marker=1,id.labels=nn,title="Figure 5. Silent allele?")
+# preFamilias(x1,new=TRUE,silentFrequency=0.05)
+# x2=x1
+# x2$pedigree[3,2]=0
+# preFamilias(x2,new=FALSE)
+# res=GetProbabilities()
+# postFamilias(res,ref=2) # 
 
 # Example 6. Simulations
-x = halfCousinPed(1);plot(x)
-x=swapSex(x,c(4,6,8))
-plot(x)
-LR=NULL
-for (i in 1:10){
-y=SNPsim(x,N=100,available=c(1,8:9),seed=i)
-preFamilias(y)
-AddPedigree()
-res=GetProbabilities()
-post=postFamilias(res,ref=2)$LR[1]
-LR=c(LR,post)
-}
+# x = halfCousinPed(1);plot(x)
+# x=swapSex(x,c(4,6,8))
+# plot(x)
+# LR=NULL
+# for (i in 1:10){
+# y=SNPsim(x,N=100,available=c(1,8:9),afreq=c(0.5,0.5),seed=i)
+# preFamilias(y)
+# AddPedigree()
+# res=GetProbabilities()
+# post=postFamilias(res,ref=2)$LR[1]
+# LR=c(LR,post)
+# }
 
 }
