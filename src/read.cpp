@@ -9,6 +9,8 @@
 #include "pater.h"
 #include "special.h"
 
+
+/*
 //Read in new lines, discarding too long lines, with an error message. 
 //Return 0 if we reach end of file, 1 otherwise.
 int get_line(istream& in, char* buf, int buflength, 
@@ -161,33 +163,6 @@ char* read_information() {
     const int buflength = 100;
     int infobuflength = buflength;
     char* infobuffer = new char[infobuflength+1];
-// Removed 2012-03-08
-/*
-    cout<<"Input case information. End with two blank lines:\n";
-    cout<<"pater information> ";
-    int n_returns = 0;
-    int i = 0;
-    char c = ' ';
-    for (;;) {
-	cin.get(c);
-	if (c=='\n') {
-	    if (n_returns==2) break;
-	    n_returns++;
-	    cout<<"pater information> ";
-	} else n_returns = 0;
-	if (i==infobuflength) {
-	    char* replacement = new char[infobuflength+buflength+1];
-	    for (i=0; i<infobuflength; i++) 
-		replacement[i] = infobuffer[i];
-	    delete[] infobuffer;
-	    infobuffer = replacement;
-	    infobuflength += buflength;
-	} 
-	infobuffer[i++] = c;
-    }
-    if (i==2) return 0; //only blank lines entered.
-    infobuffer[i-1] = '\0';
-*/
     return infobuffer;
 }
 
@@ -465,34 +440,34 @@ void read_execute_command(char* bp, pater& pat, int info, int& error) {
 //     return;
 //  }
 
-///*
-    use_cutsets = 1;
-    while ((name = get_name(bp))) {
-      do {
-	if (pat.add_person_to_cutset(name, info, error)) {
-	  pat.remove_cutsets();
-	  return;
-	}
-      } while ((name = get_name(bp)));
-      if (*bp == '\0') {
-	pat.end_cutset(info, error);
-	break;
-      }
-      if (get_char(bp,';')) {
-	pat.end_cutset(info, error);
-	continue;
-      }
-      help('e');
-      pat.remove_cutsets();
-      return;
-    }
-    if (*bp != '\0') {
-      help('e'); 
-      pat.remove_cutsets();
-      return;
-    }
-  }
-//  */
+//
+//    use_cutsets = 1;
+//    while ((name = get_name(bp))) {
+//      do {
+//	if (pat.add_person_to_cutset(name, info, error)) {
+//	  pat.remove_cutsets();
+//	  return;
+//	}
+//      } while ((name = get_name(bp)));
+//      if (*bp == '\0') {
+//	pat.end_cutset(info, error);
+//	break;
+//      }
+//      if (get_char(bp,';')) {
+//	pat.end_cutset(info, error);
+//	continue;
+//      }
+//      help('e');
+//      pat.remove_cutsets();
+//      return;
+//    }
+//    if (*bp != '\0') {
+//      help('e'); 
+//      pat.remove_cutsets();
+//      return;
+//    }
+//  }
+//  
 
   if (use_cutsets==0 && info==2) info = 1; 
   pat.execute(info, error);
@@ -762,25 +737,7 @@ char read_interactive_command(char* bp, char* buf, int has_min, int interactive,
 	   delete[] name;
 	} else help(c);
     else if (c=='q') 
-// Removed 2012-03-08
-/*
-	if (interactive) {
-	    if (pat->must_write()) {
-		char answer = ' ';
-		for (;;) {
-		    cout<<"The data has been changed since your last write command.\n";
-		    cout<<"Do you really want to quit? (y/n):";
-		    cin.get(answer);
-		    while (cin.get(c) && c != '\n');
-		    if (answer == 'y') return 'q';
-		    if (answer == 'n') return 'E';
-		}
-	    } else {
-		if (*bp=='\0') return 'q';
-		else help(c);
-	    }
-	} else */
-        { 
+       { 
 	    if (*bp=='\0') return 'q';
 	    else line_error(buf, info, error);
         }
@@ -1147,3 +1104,4 @@ void do_commands(istream& in, const int interactive,
     delete[] allelesystem;
 }
 
+*/

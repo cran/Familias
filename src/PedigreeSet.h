@@ -19,10 +19,10 @@ class PedigreeSet
       void addCutset(const char* cutsetfile); 
 
       // Return 1 if successful; 0 otherwise
-      int updateDNA(const char* datafile, 
-		    int mutationModel, 
-		    double mutationRange, 
-		    double kinship); 
+      //      int updateDNA(const char* datafile, 
+      //		    int mutationModel, 
+      //		    double mutationRange, 
+      //		    double kinship); 
 
       // Return 1 if successful; 0 otherwise
       int updateInbreeding(char* multiplier); 

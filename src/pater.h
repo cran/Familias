@@ -39,23 +39,21 @@ public:
     void add_odds(char* person1, char* person2, int info, int& error);
     void remove_odds(int info, int& error);
     void add_system(char* systemname, 
-		    double mutation_rate_female, 
-		    double mutation_rate_male, 
-		    int mutationModelFemale, 
-		    int mutationModelMale, 
+		    int lOfVector, 
+		    double* mMatrixFemale, 
+		    double* mMatrixMale, 
+		    int sMutationMatrix, 
 		    int n_possibilities, 
-		    double mutationRangeFemale, 
-		    double mutationRangeMale, 
 		    int info, 
 		    int& error);
     void remove_system(char* systemname, int info, int& error);
       
       int get_number_of_systems(); 
       
-      //Midlertidig: 
-      void setNewParameters(int mutationModel, 
-			    double mutationRange, 
-			    double kinship); 
+      //      //Midlertidig: 
+      //      void setNewParameters(int mutationModel, 
+      //			    double mutationRange, 
+      //			    double kinship); 
 
     void setKinship(double kinship); 
 

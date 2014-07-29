@@ -9,12 +9,12 @@
 class FamInterface
 {
    public:
-	   void GetNumberOfSystems(int* number);
+//	   void GetNumberOfSystems(int* number);
 
       FamInterface(); 
       ~FamInterface(); 
 
-      void GetVersion(/*[out]*/ double* version); 
+//      void GetVersion(/*[out]*/ double* version); 
 
       //In general for errors: 
       //error==0 no error
@@ -58,9 +58,9 @@ class FamInterface
 			    /*[out]*/ double* probabilities, 
 			    /*[out]*/ double* likelihoods, 
 			    /*[out]*/ int* error); 
-      void RemoveDNAObservation(/*[in]*/ int indexperson, 
-				/*[in]*/ int indexAlleleSystem, 
-				/*[out]*/ int* error);
+//      void RemoveDNAObservation(/*[in]*/ int indexperson, 
+//				/*[in]*/ int indexAlleleSystem, 
+//				/*[out]*/ int* error);
       void AddDNAObservation(/*[in]*/ int indexperson, 
 			     /*[in]*/ int indexAlleleSystem, 
 			     /*[in]*/ int indexAllele1, 
@@ -110,42 +110,40 @@ class FamInterface
 	  //is the silent allele. 
       //Note that the calling routine is responsible for allocation
       //and deallocation of all arrays. 
-      void EditAlleleSystem(/*[in]*/ int indexSystem, 
-			    /*[in]*/ int nAlleles, 
-			    /*[in]*/ double mutationRateFemale,
-			    /*[in]*/ double mutationRateMale,
-			    /*[in]*/ int mutationModelFemale, 
-			    /*[in]*/ int mutationModelMale, 
-			    /*[in]*/ int nPossibilities, 
-			    /*[in]*/ double mutationRangeFemale, 
-			    /*[in]*/ double mutationRangeMale, 
-			    /*[in]*/ double* frequencies, 
-			    /*[in]*/ int* correspondence, 
-				/*[in]*/ int hasSilentAllele, 
-			    /*[out]*/ int* error);
-
-      void RemoveAlleleSystem(/*[in]*/ int index, 
-			      /*[out ]*/ int* error);
+//      void EditAlleleSystem(/*[in]*/ int indexSystem, 
+//			    /*[in]*/ int nAlleles, 
+//			    /*[in]*/ double mutationRateFemale,
+//			    /*[in]*/ double mutationRateMale,
+//			    /*[in]*/ int mutationModelFemale, 
+//			    /*[in]*/ int mutationModelMale, 
+//			    /*[in]*/ int nPossibilities, 
+//			    /*[in]*/ double mutationRangeFemale, 
+//			    /*[in]*/ double mutationRangeMale, 
+//			    /*[in]*/ double* frequencies, 
+//			    /*[in]*/ int* correspondence, 
+//				/*[in]*/ int hasSilentAllele, 
+//			    /*[out]*/ int* error);
+//
+//      void RemoveAlleleSystem(/*[in]*/ int index, 
+//			      /*[out ]*/ int* error);
 
       //frequencies: array of length nAlleles
       void AddAlleleSystem(/*[in]*/ int nAlleles, 
-			   /*[in]*/ double mutationRateFemale, 
-			   /*[in]*/ double mutationRateMale, 
-			   /*[in]*/ int mutationModelFemale, 
-			   /*[in]*/ int mutationModelMale, 
+			   /*[in]*/ int lOfVector, 
+			   /*[in]*/ double* mMatrixFemale, 
+			   /*[in]*/ double* mMatrixMale, 
+			   /*[in]*/ int sMutationMatrix, 
 			   /*[in]*/ int nPossibilities, 
-			   /*[in]*/ double mutationRangeFemale, 
-			   /*[in]*/ double mutationRangeMale, 
 			   /*[in]*/ double* frequencies, 
 			   /*[in]*/ int hasSilentAllele, 
 			   /*[out]*/ int* index, 
 			   /*[out]*/ int* error);
 
-      //error==2: trying to remove a fixed relation
-      void RemoveRelation(/*[in]*/ int parentindex, 
-			  /*[in]*/ int childindex, 
-			  /*[in]*/ int pedigree, 
-			  /*[out]*/ int* error);
+//      //error==2: trying to remove a fixed relation
+//      void RemoveRelation(/*[in]*/ int parentindex, 
+//			  /*[in]*/ int childindex, 
+//			  /*[in]*/ int pedigree, 
+//			  /*[out]*/ int* error);
 
       //error==2: illegal relation, based on YOB or isChild data. 
       //error==3: illegal relation: cycle in pedigree, or duplicate parent. 
@@ -155,66 +153,66 @@ class FamInterface
 		       /*[out]*/ int* error);
 
       //add an extra person to the given pedigree: 
-      void AddExtraPerson(/*[in]*/ int male, 
-			  /*[in]*/ int pedigree, 
-			  /*[out]*/ int* error); 
-
-      //remove the extra person with the given index from the given pedigree: 
-      void RemoveExtraPerson(/*[in]*/ int person, 
-			     /*[in]*/ int pedigree, 
-			     /*[out]*/ int* error); 
-
-      //"matrix" is an array of size n*n, where n
-      //is the total number of persons in this pedigree. 
-      //If person i is the parent of person j, then 
-      //matrix[i+n*j]==1; otherwise matrix[i+n*j]==0. 
-      //Note that the calling function must allocate/deallocate 
-      //the array!
-      void GetPedigree(/*[in]*/ int index, 
-		       /*[out]*/ int* matrix, 
-		       /*[out]*/ int* error);
-
-      //mother and father are arrays of length n, where n
-      //is the total nubmer of persons in the pedigree nr. index. 
-      //The indices of the relevant parents are returned in these
-      //arrays, if no relevant parent is registered, -1 is returned. 
-      //Note that the calling function must allocate/deallocate 
-      //the arrays!
-      void GetParents(/*[in]*/ int index, 
-		      /*[out]*/ int* mother, 
-		      /*[out]*/ int* father, 
-		      /*[out]*/ int* error); 
-
-      //Get the total number of persons in this pedigree: 
-      void GetSizeOfPedigree(/*[in]*/ int index, 
-			     /*[out]*/ int* size, 
-			     /*[out]*/ int* error);
-
-      //Note that even when pedigrees are generated with a 
-      //certain number of extra females, some of the generated
-      //pedigrees may have fewer extra females (as some of the
-      //extras then turned out to be redundant).  
-      void GetNumberOfExtraFemales(/*[in]*/ int pedigree, 
-				   /*[out]*/ int* number, 
-				   /*[out]*/ int* error);
-
-      //Note that even when pedigrees are generated with a 
-      //certain number of extra males, some of the generated
-      //pedigrees may have fewer extra males (as some of the
-      //extras then turned out to be redundant).  
-      void GetNumberOfExtraMales(/*[in]*/ int pedigree, 
-				 /*[out]*/ int* number, 
-				 /*[out]*/ int* error);
-
-      //Functions for specifying pedigrees:  
-      //Each pedigree may have, in addition to the fixed persons, 
-      //a number of anonymous males and a number of 
-      //anonymous females. The extra females are given the first
-      //indices after the fixed persons; then follow the extra
-      //males. 
-
-      void RemovePedigree(/*[in]*/ int index, 
-			  /*[out]*/ int* error);
+//      void AddExtraPerson(/*[in]*/ int male, 
+//			  /*[in]*/ int pedigree, 
+//			  /*[out]*/ int* error); 
+//
+//      //remove the extra person with the given index from the given pedigree: 
+//      void RemoveExtraPerson(/*[in]*/ int person, 
+//			     /*[in]*/ int pedigree, 
+//			     /*[out]*/ int* error); 
+//
+//      //"matrix" is an array of size n*n, where n
+//      //is the total number of persons in this pedigree. 
+//      //If person i is the parent of person j, then 
+//      //matrix[i+n*j]==1; otherwise matrix[i+n*j]==0. 
+//      //Note that the calling function must allocate/deallocate 
+//      //the array!
+//      void GetPedigree(/*[in]*/ int index, 
+//		       /*[out]*/ int* matrix, 
+//		       /*[out]*/ int* error);
+//
+//      //mother and father are arrays of length n, where n
+//      //is the total nubmer of persons in the pedigree nr. index. 
+//      //The indices of the relevant parents are returned in these
+//      //arrays, if no relevant parent is registered, -1 is returned. 
+//      //Note that the calling function must allocate/deallocate 
+//      //the arrays!
+//      void GetParents(/*[in]*/ int index, 
+//		      /*[out]*/ int* mother, 
+//		      /*[out]*/ int* father, 
+//		      /*[out]*/ int* error); 
+//
+//      //Get the total number of persons in this pedigree: 
+//      void GetSizeOfPedigree(/*[in]*/ int index, 
+//			     /*[out]*/ int* size, 
+//			     /*[out]*/ int* error);
+//
+//      //Note that even when pedigrees are generated with a 
+//      //certain number of extra females, some of the generated
+//      //pedigrees may have fewer extra females (as some of the
+//      //extras then turned out to be redundant).  
+//      void GetNumberOfExtraFemales(/*[in]*/ int pedigree, 
+//				   /*[out]*/ int* number, 
+//				   /*[out]*/ int* error);
+//
+//      //Note that even when pedigrees are generated with a 
+//      //certain number of extra males, some of the generated
+//      //pedigrees may have fewer extra males (as some of the
+//      //extras then turned out to be redundant).  
+//      void GetNumberOfExtraMales(/*[in]*/ int pedigree, 
+//				 /*[out]*/ int* number, 
+//				 /*[out]*/ int* error);
+//
+//      //Functions for specifying pedigrees:  
+//      //Each pedigree may have, in addition to the fixed persons, 
+//      //a number of anonymous males and a number of 
+//      //anonymous females. The extra females are given the first
+//      //indices after the fixed persons; then follow the extra
+//      //males. 
+//
+//      void RemovePedigree(/*[in]*/ int index, 
+//			  /*[out]*/ int* error);
 
       //Adding a pedigree with only the fixed relations: 
       void AddPedigree(/*[in]*/ int nExtraFemales, 
@@ -222,44 +220,44 @@ class FamInterface
 		       /*[out]*/ int* index, 
 		       /*[out]*/ int* error);
 
-      void GetNumberOfPedigrees(/*[out]*/ int* number);
-
-      //Generating a set of pedigrees. 
-      //The equivalent pedigrees among the existing set are first
-      //removed, and the removed ones are indicated in the "removed" array. 
-      //Then, new pedigrees are added to the end of the list. 
-      void GeneratePedigrees(/*[in]*/ int nExtraFemales, 
-			     /*[in]*/ int nExtraMales, 
-			     /*[out]*/ int* removed, 
-			     /*[out]*/ int* error);
-
-      //If the relation did not exist, the function does nothing. 
-      void RemoveFixedRelation(/*[in]*/ int parentindex, 
-			       /*[in]*/ int childindex, 
-			       /*[out]*/ int* error);
-
-      //There is a set of "fixed relations" which all pedigrees have in 
-      //common. Then, each specific pedigree may have additional relations. 
-      //error==2: illegal relation, based on YOB or isChild data. 
-      //error==3: illegal relation: child cannot be its own parent!
-      //error==4: illegal relation: child is ancestor of parent
-      //error==5: illegal relation: child already has such parent. 
-      //The relation is added to all present pedigrees: For some, the
-      //relation is illegal in that particular pedigree. Then, that 
-      //pedigree is removed from the list of pedigrees. A list of 
-      //indicators is returned, indicating which pedigrees are removed. 
-      //NOTE: The array removed must be allocated and deallocated by
-      //the calling routine. Its length should equal to the number of 
-      //pedigrees. 
-      void AddFixedRelation(/*[in]*/ int parentindex, 
-			    /*[in]*/ int childindex, 
-			    /*[out]*/ int* removed, 
-			    /*[out]*/ int* error);
-
-      //Removing a person
-      void RemovePerson(/*[in]*/ int index, 
-			/*[out]*/ int* error);
-
+//      void GetNumberOfPedigrees(/*[out]*/ int* number);
+//
+//      //Generating a set of pedigrees. 
+//      //The equivalent pedigrees among the existing set are first
+//      //removed, and the removed ones are indicated in the "removed" array. 
+//      //Then, new pedigrees are added to the end of the list. 
+//      void GeneratePedigrees(/*[in]*/ int nExtraFemales, 
+//			     /*[in]*/ int nExtraMales, 
+//			     /*[out]*/ int* removed, 
+//			     /*[out]*/ int* error);
+//
+//      //If the relation did not exist, the function does nothing. 
+//      void RemoveFixedRelation(/*[in]*/ int parentindex, 
+//			       /*[in]*/ int childindex, 
+//			       /*[out]*/ int* error);
+//
+//      //There is a set of "fixed relations" which all pedigrees have in 
+//      //common. Then, each specific pedigree may have additional relations. 
+//      //error==2: illegal relation, based on YOB or isChild data. 
+//      //error==3: illegal relation: child cannot be its own parent!
+//      //error==4: illegal relation: child is ancestor of parent
+//      //error==5: illegal relation: child already has such parent. 
+//      //The relation is added to all present pedigrees: For some, the
+//      //relation is illegal in that particular pedigree. Then, that 
+//      //pedigree is removed from the list of pedigrees. A list of 
+//      //indicators is returned, indicating which pedigrees are removed. 
+//      //NOTE: The array removed must be allocated and deallocated by
+//      //the calling routine. Its length should equal to the number of 
+//      //pedigrees. 
+//      void AddFixedRelation(/*[in]*/ int parentindex, 
+//			    /*[in]*/ int childindex, 
+//			    /*[out]*/ int* removed, 
+//			    /*[out]*/ int* error);
+//
+//      //Removing a person
+//      void RemovePerson(/*[in]*/ int index, 
+//			/*[out]*/ int* error);
+//
       //Adding a single person to the set of specified persons. 
       //male: 1 if male, 0 if female. For now, we assume that all
       //persons have a known sex. 

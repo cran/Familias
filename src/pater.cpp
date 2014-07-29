@@ -91,23 +91,19 @@ void pater::remove_odds(int info, int& error) {
 }
 
 void pater::add_system(char* systemname, 
-		       double mutation_rate_female, 
-		       double mutation_rate_male, 
-		       int mutationModelFemale, 
-		       int mutationModelMale, 
+		       int lOfVector, 
+		       double* mMatrixFemale, 
+		       double* mMatrixMale, 
+		       int sMutationMatrix, 
 		       int n_possibilities, 
-		       double mutationRangeFemale, 
-		       double mutationRangeMale, 
 		       int info, 
 		       int& error) {
     if (alldat.add_system(systemname, 
-			  mutation_rate_female,
-			  mutation_rate_male,
-			  mutationModelFemale, 
-			  mutationModelMale, 
+			  lOfVector, 
+			  mMatrixFemale, 
+			  mMatrixMale, 
+			  sMutationMatrix, 
 			  n_possibilities, 
-			  mutationRangeFemale, 
-			  mutationRangeMale, 
 			  info, 
 			  error)) 
        rewrite = recalculate = 1;
@@ -123,6 +119,7 @@ int pater::get_number_of_systems()
    return alldat.get_number_of_systems(); 
 }
 
+/*
 void pater::setNewParameters(int mutationModel, 
 			     double mutationRange, 
 			     double kinship)
@@ -139,6 +136,7 @@ rewrite = recalculate = 1;
 
 //////////////////////////////////////////////////////////
 }
+*/
 
 void pater::setKinship(double kinship)
 {

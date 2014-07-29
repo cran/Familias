@@ -166,6 +166,7 @@ void PedigreeSet::addCutset(const char* cutsetfile)
    }
 }
 
+/*
 int PedigreeSet::updateDNA(const char* datafile, 
 			   int mutationModel, 
 			   double mutationRange, 
@@ -314,6 +315,8 @@ int PedigreeSet::updateDNA(const char* datafile,
    delete pat;
    return 1; 
 }
+*/
+
 
 void PedigreeSet::write(const char* outputfile)
 {

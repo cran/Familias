@@ -13,50 +13,44 @@ The code is now released in an R package.
 \tabular{ll}{
 Package: \tab Familias\cr
 Type: \tab Package\cr
-Version: \tab 1.0\cr
-Date: \tab 2012-02-17\cr
+Version: \tab 2.0\cr
+Date: \tab 2014-07-17\cr
 License: \tab GPL-2\cr
 LazyLoad: \tab yes\cr
 }
-This package represents a bare-bones implementation of an interface to the 
-core Familias functions, which are programmed in C++. The package itself
-functions as a kind of database, where information about persons, 
-pedigrees, allele systems and observations for persons are entered stepwise. 
-In the end, probability calculations are made. 
+This package represents an implementation of an interface to the 
+core Familias functions, which are programmed in C++. 
+Note that this version, 2.0, implements 
+a completely different interface to the core functions compared to the previous versions. 
 }
 \author{
-Petter Mostad <mostad@chalmers.se> 
+Petter Mostad <mostad@chalmers.se> and Thore Egeland <Thore.Egeland@gmail.com>
 }
 \references{
 For more information, see www.familias.name
 }
 \keyword{ package }
 \examples{
-# Minimal computations for a paternity case: 
-NewFamilias()
-# Mother, putative father and child is added: 
-AddPerson(FALSE)
-AddPerson(TRUE)
-AddPerson(TRUE)
-# Mother is specified as paret to child: 
-AddFixedRelation(1, 3)
-# A first pedigree is added: 
-AddPedigree()
-# In this pedigree, it is specified that the putative father is the true father
-AddRelation(2, 3, 1)
-# A second pedigree is added, where the putative father is not the true father
-AddPedigree()
-# A first allele system is added, with three possible alleles
-AddAlleleSystem(c(0.2, 0.3, 0.5))
-# A second allele system is added, with three possible alleles
-AddAlleleSystem(c(0.1, 0.1, 0.1))
-# DNA observations are added for the mother, father, and child: 
-AddDNAObservation(1, 1, 1)
-AddDNAObservation(1, 2, 1, 2)
-AddDNAObservation(2, 1, 2)
-AddDNAObservation(2, 2, 1, 2)
-AddDNAObservation(3, 1, 1, 2)
-AddDNAObservation(3, 2, 1, 2)
-# The result is calculated
-GetProbabilities()
+persons <- c("mother", "daughter", "AF")
+ped1 <- pedigree(id=persons, dadid=c(NA, "AF", NA), momid=c(NA, "mother", NA), 
+sex=c("female", "female", "male"))
+ped2 <- pedigree(id=c(persons, "TF"), dadid=c(NA, "TF", NA, NA), momid=c(NA, "mother", NA, NA), 
+sex=c("female", "female", "male", "male"))
+ped3 <- pedigree(id=c(persons, "TF", "gf", "gm"), dadid = c(NA, "TF", "gf", "gf", NA, NA), 
+momid=c(NA, "mother", "gm", "gm", NA, NA), 
+sex=c("female", "female", "male", "male", "male", "female"))
+par(mfrow=c(3,1))
+plot(ped1);title("ped1, i.e., AF is father")
+plot(ped2);title("ped2, i.e., AF is unrelated")
+plot(ped3);title("ped3, i.e., AF is uncle")
+par(mfrow=c(1,1))
+mypedigrees <- list(isFather = ped1, unrelated=ped2, isUncle = ped3)
+locus1 <- FamiliasLocus(frequencies=c(0.1, 0.2, 0.3, 0.4), name="locus1", 
+allelenames= c("A", "B", "C", "D"))
+locus2 <- FamiliasLocus(c(0.2, 0.3, 0.5), "loc2", c(17, 18, 19), femaleMutationRate = 0.05)
+myloci <- list(locus1, locus2)
+datamatrix <- data.frame(locus1.1=c("A", "A", "A"), locus1.2=c("B", "B", "C"), 
+locus2.1=c(17, 19, 19), locus2.2=c(18, 18, 18))
+rownames(datamatrix) <- persons
+result=FamiliasPosterior(mypedigrees, myloci, datamatrix)
 }

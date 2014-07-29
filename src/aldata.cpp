@@ -150,73 +150,27 @@ allelesystem* alleledata::get_system(char* name) {
 } 
 
 int alleledata::add_system(char* name, 
-			   double mutationrateFemale, 
-			   double mutationrateMale, 
-			   int mutationModelFemale, 
-			   int mutationModelMale, 
+			   int lOfVector, 
+			   double* mMatrixFemale, 
+			   double* mMatrixMale, 
+			   int sMutationMatrix, 
 			   int n_possibilities, 
-			   double mutationRangeFemale, 
-			   double mutationRangeMale, 
 			   int info, 
 			   int& error) {
-   if (mutationrateFemale<0 || mutationrateMale<0) {
-// Removed 2012-03-08
-//      if (info>0)
-//	 cout<<"ERROR: The mutation rate cannot be negative.\n";
-      error = 1; 
-      delete[] name;
-      return 0;
-   }
-   if (mutationrateFemale>=1 || mutationrateMale>=1) {
-// Removed 2012-03-08
-//      if (info>0)
-//	 cout<<"ERROR: The mutation rate must be less than 1.\n";
-      error = 1; 
-      delete[] name;
-      return 0;
-   }
-//   if (n_possibilities < 2) {
-//      if (info>0)
-//	 cout<<"ERROR: The number of possible alleles must be at least 2.\n";
-//      error = 1; 
-//      delete[] name;
-//      return 0;
-//   }
-   allelesystem* p = get_system(name);
-   if (p) {
-      delete[] name;
-      return p->new_mutationrate(mutationrateFemale,
-				 mutationrateMale,
-				 mutationModelFemale, 
-				 mutationModelMale, 
-				 n_possibilities, 
-				 mutationRangeFemale, 
-				 mutationRangeMale, 
-				 info, 
-				 error);
-   }
+
+
    if (a) a->add_at_end(new allelesystem(name, 
-					 mutationrateFemale, 
-					 mutationrateMale, 
-					 mutationModelFemale, 
-					 mutationModelMale, 
-					 n_possibilities, 
-					 mutationRangeFemale,
-					 mutationRangeMale));
+					 lOfVector, 
+					 mMatrixFemale, 
+					 mMatrixMale, 
+					 sMutationMatrix, 
+					 n_possibilities));
    else a = new allelesystem(name, 
-			     mutationrateFemale, 
-			     mutationrateMale, 
-			     mutationModelFemale, 
-			     mutationModelMale, 
-			     n_possibilities, 
-			     mutationRangeFemale,
-			     mutationRangeMale);
-// Removed 2012-03-08
-//   if (info>1) 
-//      cout<<"The allele system \""<<name<<"\" with female mutation rate "
-//	  <<mutationrateFemale<<",\nmale mutation rate "
-//	  <<mutationrateMale<<",\nand "<<n_possibilities<<" possible alleles"
-//	  <<" added to the data.\n";
+			     lOfVector, 
+			     mMatrixFemale, 
+			     mMatrixMale, 
+			     sMutationMatrix, 
+			     n_possibilities);
    return 1;
 }
 
@@ -226,17 +180,17 @@ int alleledata::get_number_of_systems()
    return a->get_number_of_systems(); 
 }
 
-void alleledata::setMutation(int mutationModel, 
-			     double mutationRange)
-{
-   allelesystem* p = a; 
-   while (p) 
-   {
-      p->setMutation(mutationModel, 
-		     mutationRange); 
-      p = p->get_next(); 
-   }
-}
+//void alleledata::setMutation(int mutationModel, 
+//			     double mutationRange)
+//{
+//   allelesystem* p = a; 
+//   while (p) 
+//   {
+//      p->setMutation(mutationModel, 
+//		     mutationRange); 
+//      p = p->get_next(); 
+//   }
+//}
 
 void alleledata::setKinship(double kinship)
 {

@@ -15,6 +15,8 @@ class pater;
 //along the way. It will then call the appropriate routine of the 
 //pater object supplied, unless the command is "quit" or if 
 //the end of file is reached; then it will just terminate. 
-extern void do_commands(istream& in, const int interactive, pater*& pat, int& error);
+
+//NOT USED: 
+//extern void do_commands(istream& in, const int interactive, pater*& pat, int& error);
 
 #endif

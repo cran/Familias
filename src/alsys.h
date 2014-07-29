@@ -27,17 +27,27 @@ public:
 
 class allelesystem {
     char* Systemname;
-    double mutationrateFemale;
-    double mutationrateMale;
-    int mutationModelFemale; 
-    int mutationModelMale; 
+
+
+    ////2014-07-23: The following 6 parameters were replaced with the 
+    //// next 4 parameters: 
+    //    double mutationrateFemale;
+    //    double mutationrateMale;
+    //    int mutationModelFemale; 
+    //    int mutationModelMale; 
+    //    //The following parameter is only meaningful when mutationModel==2: 
+    //    double mutationRangeFemale; 
+    //    double mutationRangeMale;
+    //// WERE REPLACED BY: 
+    int lengthOfVector; //Ugly way to make construction etc smooth. 
+    double* mutationMatrixFemale; 
+    double* mutationMatrixMale; 
+    int simplifyMutationMatrix; 
+
     //The number below represents the total number of possible "alleles"
     //a mutation can mutate TO. We must always have n_possibilities>=2.
     //This parameter is only meaningful for mutationModel==0. 
     int n_possibilities;
-    //The following parameter is only meaningful when mutationModel==2: 
-    double mutationRangeFemale; 
-    double mutationRangeMale; 
     //Used to adjust probabilities: 
     double kinship; 
 
@@ -45,7 +55,6 @@ class allelesystem {
 
     //Full contents of system:
     int n_alleles;
-    //We must always have n_alleles <= n_possibilities-1.
     char** name;
     //The general population probability ( >=0) of each of the alleles 
     //listed in "name". The sum of the array numbers must be <=1. 
@@ -78,28 +87,18 @@ class allelesystem {
     //an allele i, and, after a POSSIBLE mutation, end up with j.
     double** dataprobmatrixFemale;
     double** dataprobmatrixMale;
+
     //The following flag is set to 1 whenever the 4 variables above 
     //must be recalculated before use.
     int recalc_data;
 
-      //Write the "reduced" transision matrix computed above to 
-      //the files "MutMatrixFemale.txt" and "MutMatrixMale.txt". 
-      //The "names" of the rows and
-      //columns are -1 if the allele does not correspond to 
-      //a allele in the data system, 0 if it corresponds to several, 
-      //and a positive number indicates the allele it corresponds to 
-      //if it corresponds to exactly one. 
-      void printMutMatrix(); 
-
 public:
     allelesystem(char* name, 
-		 double mutationrateFemale, 
-		 double mutationrateMale, 
-		 int mutationModelFemale, 
-		 int mutationModelMale, 
-		 int n_poss, 
-		 double mutationRangeFemale,
-		 double mutationRangeMale); 
+		 int lOfVector, 
+		 double* mMatrixFemale, 
+		 double* mMatrixMale, 
+		 int sMutationMatrix, 
+		 int n_poss); 
 
     ~allelesystem();
 
@@ -112,18 +111,20 @@ public:
     double Result() { return result; }
     void remove_next(allelesystem* s);
 
-    int new_mutationrate(double mutationrateFemale, 
-			 double mutationrateMale, 
-			 int mutationModelFemale, 
-			 int mutationModelMale, 
-			 int n_possibilities, 
-			 double mutationRangeFemale, 
-			 double mutationRangeMale, 
-			 int info, 
-			 int& error);
+    //REMOVED 2014-07-23 as it is not needed when the code is used 
+    //as an R interface: 
+    //    int new_mutationrate(double mutationrateFemale, 
+    //			 double mutationrateMale, 
+    //			 int mutationModelFemale, 
+    //			 int mutationModelMale, 
+    //			 int n_possibilities, 
+    //			 double mutationRangeFemale, 
+    //			 double mutationRangeMale, 
+    //			 int info, 
+    //			 int& error);
       
-      void setMutation(int mutationModel, 
-		       double mutationRange); 
+    //      void setMutation(int mutationModel, 
+    //		       double mutationRange); 
 
       void setKinship(double kinship); 
 

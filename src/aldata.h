@@ -33,13 +33,11 @@ public:
     //If data is indeed changed, the return value is 1, otherwise 0.
 
     int add_system(char* name, 
-		   double mutationrateFemale, 
-		   double mutationrateMale, 
-		   int mutationModelFemale, 
-		   int mutationModelMale, 
+		   int lOfVector, 
+		   double* mMatrixFemale, 
+		   double* mMatrixMale, 
+		   int sMutationMatrix, 
 		   int n_possibilities, 
-		   double mutationRangeFemale, 
-		   double mutationRangeMale, 
 		   int info, 
 		   int& error);
     //If system exists, set new mutationrate.
@@ -47,8 +45,8 @@ public:
 
       int get_number_of_systems(); 
 
-      void setMutation(int mutationModel, 
-		       double mutationRange); 
+      //      void setMutation(int mutationModel, 
+      //		       double mutationRange); 
 
       void setKinship(double kinship); 
 

@@ -44,12 +44,12 @@ FamInterface::~FamInterface()
    delete[] internalSystemName; 
    delete[] internalAlleleName; 
 }
-
+/*
 void FamInterface::GetVersion(double* vers)
 {
    *vers = numericVersion; 
 }
-
+*/
 void FamInterface::AddPerson(int mal, int yob, int ischi, int *index, int *error)
 {
    if ((mal != 0 && mal != 1) || (ischi !=0 && ischi != 1))
@@ -93,7 +93,7 @@ void FamInterface::AddPerson(int mal, int yob, int ischi, int *index, int *error
    pedset.addPerson(mal); 
    nPersons++; 
 }
-
+/*
 void FamInterface::RemovePerson(int index, int *error)
 {
    if (index<0 || index>=nPersons)
@@ -235,7 +235,7 @@ void FamInterface::GetNumberOfPedigrees(int *number)
 {
    *number = pedset.getNumberOfPedigrees(); 
 }
-
+*/
 void FamInterface::AddPedigree(int nExtraFemales, 
 			       int nExtraMales, 
 			       int *index, 
@@ -251,7 +251,7 @@ void FamInterface::AddPedigree(int nExtraFemales,
 		      nExtraMales); 
    *index = pedset.getNumberOfPedigrees()-1; 
 }
-
+/*
 void FamInterface::RemovePedigree(int index, 
 				  int *error)
 {
@@ -329,7 +329,7 @@ void FamInterface::GetParents(int index,
    *error = 0; 
    pedset.getPedigree(index)->getParents(mother, father); 
 }
-
+*/
 void FamInterface::AddRelation(int parentindex, 
 			       int childindex, 
 			       int index, 
@@ -382,7 +382,7 @@ void FamInterface::AddRelation(int parentindex,
 		    *error); 
    if (*error>0) *error = 3; 
 }
-
+/*
 void FamInterface::AddExtraPerson(int mal, 
 				  int index, 
 				  int *error)
@@ -442,35 +442,19 @@ void FamInterface::RemoveRelation(int parentindex,
    ped->removeRelation(parentindex, 
 		       childindex); 
 }
-
+*/
 void FamInterface::AddAlleleSystem(int nAll, 
-				   double mutationRateFemale, 
-				   double mutationRateMale, 
-				   int mutationModelFemale, 
-				   int mutationModelMale, 
+				   int lOfVector, 
+				   double* mMatrixFemale, 
+				   double* mMatrixMale, 
+				   int sMutationMatrix, 
 				   int nPossibilities, 
-				   double mutationRangeFemale, 
-				   double mutationRangeMale, 
 				   double *frequencies,
 				   int hasSilentAllele,  
 				   int *index, 
 				   int *error)
 {
    if (nAll < 1 ||
-       mutationRateFemale      < 0 || 
-       mutationRateMale        < 0 || 
-       mutationRateFemale     >= 1 ||
-       mutationRateMale       >= 1 ||
-       mutationModelFemale     < 0 ||
-       mutationModelMale       < 0 ||
-       mutationModelFemale     > 3 ||
-       mutationModelMale       > 3 ||
-       //nPossibilities       < nAll ||
-       //nPossibilities          < 2 ||
-       mutationRangeFemale    <= 0 ||
-       mutationRangeMale      <= 0 ||
-       mutationRangeFemale    >= 1 ||
-       mutationRangeMale      >= 1 ||
 	   hasSilentAllele         < 0 ||
 	   hasSilentAllele         > 1)
    {
@@ -535,13 +519,11 @@ void FamInterface::AddAlleleSystem(int nAll,
    
    int paterError = 0; 
    pat.add_system(newcopy(internalSystemName[nSystems]), 
-		  mutationRateFemale, 
-		  mutationRateMale, 
-		  mutationModelFemale, 
-		  mutationModelMale, 
+		  lOfVector, 
+		  mMatrixFemale, 
+		  mMatrixMale, 
+		  sMutationMatrix, 
 		  nPossibilities, 
-		  mutationRangeFemale, 
-		  mutationRangeMale, 
 		  0, 
 		  paterError); 
    //removed 2012-03-16
@@ -559,7 +541,7 @@ void FamInterface::AddAlleleSystem(int nAll,
    nSystems++; 
    *error = 0;
 }
-
+/*
 void FamInterface::RemoveAlleleSystem(int index, int *error)
 {
    if (index<0 || index>=nSystems)
@@ -738,7 +720,7 @@ void FamInterface::EditAlleleSystem(int indexSystem,
    //removed 2012-03-16
    //   assert(paterError == 0); //internal error. 
 }
-
+*/
 void FamInterface::AddDNAObservation(int indexperson, 
 				     int indexAlleleSystem, 
 				     int indexAllele1, 
@@ -763,7 +745,7 @@ void FamInterface::AddDNAObservation(int indexperson,
    //removed 2012-03-16
    //   assert(paterError==0); //internal error
 }
-
+/*
 void FamInterface::RemoveDNAObservation(int indexperson, 
 					int indexAlleleSystem, 
 					int *error)
@@ -782,7 +764,7 @@ void FamInterface::RemoveDNAObservation(int indexperson,
    //removed 2012-03-16
    //   assert(paterError==0); //internal error
 }
-
+*/
 void FamInterface::GetProbabilities(double generationsParameter, 
 				    int maxGenerations, 
 				    double inbreedingParameter, 
@@ -840,8 +822,9 @@ void FamInterface::GetProbabilities(double generationsParameter,
    }
 //   delete[] isChild; 
 }
-
+/*
 void FamInterface::GetNumberOfSystems(int* number)
 {
 	*number = nSystems; 
 }
+*/

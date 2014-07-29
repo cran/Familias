@@ -26,21 +26,15 @@ void dataitem::remove_next(dataitem* dit) {
 
 
 allelesystem::allelesystem(char* sname, 
-			   double rateFemale, 
-			   double rateMale, 
-			   int mutationModFemale, 
-			   int mutationModMale, 
-			   int n_poss, 
-			   double mutRangeFemale, 
-			   double mutRangeMale) :
+			   int lOfVector, 
+			   double* mMatrixFemale, 
+			   double* mMatrixMale, 
+			   int sMutationMatrix, 
+			   int n_poss) :
    Systemname(sname), 
-   mutationrateFemale(rateFemale), 
-   mutationrateMale(rateMale), 
-   mutationModelFemale(mutationModFemale), 
-   mutationModelMale(mutationModMale), 
+   lengthOfVector(lOfVector),
+   simplifyMutationMatrix(sMutationMatrix),
    n_possibilities(n_poss), 
-   mutationRangeFemale(mutRangeFemale), 
-   mutationRangeMale(mutRangeMale), 
    kinship(0), 
    next(0),
    n_alleles(0), 
@@ -55,11 +49,21 @@ allelesystem::allelesystem(char* sname,
    dataprobability(0), 
    dataprobmatrixFemale(0),
    dataprobmatrixMale(0),
-   recalc_data(1) {}
+   recalc_data(1) {
+  int i; 
+  mutationMatrixFemale = new double[lOfVector]; 
+  mutationMatrixMale   = new double[lOfVector]; 
+  for (i=0; i<lOfVector; i++) {
+    mutationMatrixFemale[i] = mMatrixFemale[i]; 
+    mutationMatrixMale[i]   = mMatrixMale[i]; 
+  } 
+}
 
 allelesystem::~allelesystem() {
     int i;
     delete[] Systemname;
+    delete[] mutationMatrixFemale; 
+    delete[] mutationMatrixMale; 
     for (i=0; i<n_alleles; i++) 
 	delete[] name[i];
     delete[] name;
@@ -85,6 +89,7 @@ void allelesystem::remove_next(allelesystem* s) {
     else next->remove_next(s);
 }
 
+/*
 int allelesystem::new_mutationrate(double rateFemale,
 				   double rateMale, 
 				   int mutationModFemale, 
@@ -107,38 +112,6 @@ int allelesystem::new_mutationrate(double rateFemale,
       return 0;
    }
 
-   
-   
-// THESE TESTS SHOULD NOT ME NECESSARY NOW:    
-//   if ((mutationModelFemale != 2 || mutationModelMale != 2) 
-//       && n_poss < n_alleles) 
-//   {
-//      if (info>0)
-//	 cout<<"ERROR: There are "<<n_alleles
-//	     <<" registered alleles in the system \""
-//	     <<Systemname
-//	     <<"\".\nThe number of possible alleles must be "
-//	     <<"at least that number.\n";
-//      error = 1; 
-//      return 0;
-//   }
-//   if ((mutationModelFemale != 2 || mutationModelMale != 2)
-//       && n_poss == n_alleles) 
-//   { //The sum of the frequencies in the system must be 1.
-//      double sum = 0;
-//      for (int i = 0; i<n_alleles; i++) sum += probability[i];
-//      if (sum <= 0.999 || sum >= 1.001) 
-//      {
-//	 if (info>0)
-//	    cout<<"ERROR: The number of possible alleles cannot "
-//		<<"be set equal to the\n"
-//		<<"actual number of alleles unless "
-//		<<"their frequencies sum to 1.\n";
-//	 error = 1; 
-//	 return 0;
-//      }
-//   }
-
    mutationrateFemale    = rateFemale;
    mutationrateMale      = rateMale;
    mutationModelFemale   = mutationModFemale; 
@@ -147,25 +120,19 @@ int allelesystem::new_mutationrate(double rateFemale,
    mutationRangeFemale   = mutRangeFemale; 
    mutationRangeMale     = mutRangeMale; 
    recalc_data = 1;
-// Removed 2012-03-08
-//   if (info>1)
-//   {
-//      cout<<"The system "<<Systemname<<" now has female mutation rate "
-//	  <<rateFemale<<",\nmale mutation rate"<<rateMale
-//	  <<",\nand "<<n_poss<<"  possible alleles.\n";
-//   }
    return 1;
 }
+*/
 
-void allelesystem::setMutation(int mutMod, 
-			       double mutRange)
-{
-   mutationModelFemale = mutMod; 
-   mutationModelMale = mutMod; 
-   mutationRangeFemale = mutRange; 
-   mutationRangeMale = mutRange; 
-   recalc_data = 1; 
-}
+//void allelesystem::setMutation(int mutMod, 
+//			       double mutRange)
+//{
+//   mutationModelFemale = mutMod; 
+//   mutationModelMale = mutMod; 
+//   mutationRangeFemale = mutRange; 
+//   mutationRangeMale = mutRange; 
+//   recalc_data = 1; 
+//}
 
 void allelesystem::setKinship(double kship)
 {
@@ -186,10 +153,6 @@ int allelesystem::add_allele(char* allelename,
 {
    int i;
    if (prob<=0) {
-// Removed 2012-03-08
-//      if (info>0)
-//	 cout<<"ERROR: The given probability "<<prob
-//	     <<" must be greater than 0!\n";
       error = 1; 
       delete[] allelename;
 	  return 0;
@@ -204,84 +167,25 @@ int allelesystem::add_allele(char* allelename,
 		return 0;
 	 }
 
-// THIS TEST CREATES PROBLEMS WHEN USED TOGETHER WITH THE 
-// EditAlleleSystem command of FamInterface, SO IT IS REMOVED: 
-//
-//	 if ((mutationModelFemale != 2 || mutationModelMale != 2) 
-//	     && n_alleles==n_possibilities) 
-//	 {
-//	    if (info>0)
-//	       cout<<"ERROR: Resetting the probability of the allele \""
-//		   <<allelename<<"\" in the system \""<<Systemname<<"\"\n"
-//		   <<"is impossible as long as the number of alleles in the "
-//		   <<"system\nis equal to the possible number of alleles.\n";
-//	    error = 1; 
-//	    delete[] allelename;
-//		return 0;
-//	 }
-
 
 	 if (sum + prob - probability[i] >= 1.001) 
 	 {
-// Removed 2012-03-08
-//	    if (info>0)
-//	       cout<<"ERROR: Setting the probability "<<prob
-//		   <<" to the allele "<<allelename
-//		   <<" gives a\nprobability sum greater than 1 in "
-//		   <<"the system \""<<Systemname<<"\".\n";
 	    error = 1; 
 	    delete[] allelename;
 		return 0;
 	 }
 	 probability[i] = prob;
 	 recalc_data = 1;
-// Removed 2012-03-08
-//	 if (info>1)
-//	    cout<<"The allele \""<<allelename<<"\" in the system \""
-//		<<Systemname<<"\" gets the probability "<<prob<<".\n";
 	 delete[] allelename;
 	 return 1;
       }
-//   if ((mutationModelFemale < 2 || mutationModelMale < 2)
-//       && n_alleles==n_possibilities) 
-//   {
-//      if (info>0)
-//	 cout<<"ERROR: Before another allele can be added "
-//	     <<"to the system "<<Systemname<<",\n"
-//	     <<"the total number of possible alleles in "
-//	     <<"the system must be increased from "
-//	     <<n_possibilities<<".\n";
-//	  error = 1; 
-//      delete[] allelename;
-//      return 0;
-//   }
    if (sum + prob > 1.001) 
    {
-// Removed 2012-03-08
-//      if (info>0)
-//	 cout<<"ERROR: Setting the probability "<<prob<<" to the allele "
-//	     <<allelename<<" gives a\nprobability sum greater than 1 in "
-//	     <<"the system \""<<Systemname<<"\".\n";
       error = 1; 
       delete[] allelename;
 	  return 0;
    }
 
-//When the program is run from the VB coat, this is unneccessary: 
-//   if ((mutationModelFemale != 2 || mutationModelMale != 2) && 
-//       n_alleles==n_possibilities-1 && 
-//       sum + prob < 0.999) 
-//   {
-//      if (info>0)
-//	 cout<<"ERROR: The allele \""<<allelename
-//	     <<"\" is the last possible allele in\n"
-//	     <<"the system \""<<Systemname
-//	     <<"\", so its frequency must be "<<1-sum<<",\n"
-//	     <<"and not "<<prob<<", to make the sum of the frequencies 1.\n";
-//      error = 1; 
-//      delete[] allelename;
-//	  return 0;
-//   }
 
    n_alleles++;
    double* newprobability = new double[n_alleles];
@@ -298,11 +202,6 @@ int allelesystem::add_allele(char* allelename,
    name = newname;
    probability[n_alleles-1] = prob;
    name[n_alleles-1] = allelename;
-// Removed 2012-03-08
-//   if (info>1)
-//      cout<<"The allele \""<<allelename<<"\" with probability "<<prob
-//	  <<" added to the system \""
-//	  <<Systemname<<"\".\n";
    recalc_data = 1;
    return 1;
 }
@@ -314,10 +213,6 @@ int allelesystem::add_data(person& p, char* allele1, char* allele2,
    for (;;) {
       if (i==n_alleles) 
       {
-// Removed 2012-03-08
-//	 if (info>0)
-//	    cout<<"ERROR: The allele \""<<allele1<<"\" could not be found "
-//	       "in the system \""<<Systemname<<"\".\n";
 	 error = 1; 
 	 delete[] allele1; 
 	 delete[] allele2;
@@ -330,10 +225,6 @@ int allelesystem::add_data(person& p, char* allele1, char* allele2,
    for (;;) {
       if (j==n_alleles) 
       {
-// Removed 2012-03-08
-//	 if (info>0)
-//	    cout<<"ERROR: The allele \""<<allele2<<"\" could not be found "
-//	       "in the system \""<<Systemname<<"\".\n";
 	 error = 1; 
 	 delete[] allele1; 
 	 delete[] allele2;
@@ -370,10 +261,6 @@ int allelesystem::add_data(person& p, char* allele1, char* allele2,
    dit = new dataitem(p,i,j);
    if (data) data->append(dit);
    else data = dit;
-// Removed 2012-03-08
-//   if (info>1)
-//      cout<<"Alleles \""<<allele1<<"\" and \""<<allele2<<"\" for \""
-//	  <<p.name()<<"\" have been added to the data.\n";
    recalc_data = 1;
    delete[] allele1; 
    delete[] allele2;
@@ -404,12 +291,6 @@ int allelesystem::remove_allele(char* allelename, int info, int& error)
 	 dataitem* dit = data;
 	 while (dit) {
 	    if (dit->allele1==i || dit->allele2==i) {
-// Removed 2012-03-08
-//	       if (info>0)
-//		  cout<<"ERROR: The allele \""<<allelename<<"\" may not be "
-//		      <<"removed from system \""<<Systemname<<"\".\n\""
-//		      <<dit->p->name()
-//		      <<"\" still has this allele as data.\n";
 	       error = 1; 
 	       delete[] allelename;
 	       return 0;
@@ -438,18 +319,10 @@ int allelesystem::remove_allele(char* allelename, int info, int& error)
 			 silentAllele--; 
 	 }
 	 n_alleles--;
-// Removed 2012-03-08
-//	 if (info>1)
-//	    cout<<"The allele \""<<allelename<<"\" is removed from the"
-//		<<"system \""<<Systemname<<"\".\n";
 	 recalc_data = 1;
 	 delete[] allelename;
 	 return 1;
       }
-// Removed 2012-03-08
-//   if (info>0)
-//      cout<<"ERROR: No allele \""<<allelename<<"\" found in system \""
-//	  <<Systemname<<".\n";
    error = 1; 
    delete[] allelename;
    return 0;
@@ -464,10 +337,6 @@ int allelesystem::remove_data(person& p, int info, int&)
 	 else data->remove_next(dit);
 	 dit->next = 0;
 	 delete dit;
-// Removed 2012-03-08
-//	 if (info>1) 
-//	    cout<<"The data of the person \""<<p.name()<<"\" has been removed "
-//		<<"from system \""<<Systemname<<"\".\n";
 	 recalc_data = 1;
 	 return 1;
       }
@@ -476,8 +345,54 @@ int allelesystem::remove_data(person& p, int info, int&)
    return 0;
 }
 
+//NEW VERSION OF compute_dataprob(), programmed 2014-07-23: 
+//This version takes as "input" the following data, which is assumed to be 
+//stored in this object, and to be correct: 
 
-/*
+//Parameterset 1: This is old input, and should be kept as is. 
+//int n_alleles: The total number of alleles in this system, INCLUDING a possible silent allele. 
+//int hasSilentAllele: indicator 1/0 
+//int silentAllele: INDEX of the silent allele in the full system
+//double* probability: Array, from 0 to n_alleles-1, indicating allele probabilities. 
+//Note that the probabilities now always sum to 1! 
+
+//Parameterset 2: "OLD" input parameters, to be replaced by Parameterset 3: 
+//double mutationrateFemale
+//double mutationrateMale
+//int mutationModelFemale
+//int mutationModelMale
+//double mutationRangeFemale
+//double mutationRangeMale
+
+//Parameterset 3: "NEW" input parameters, to replace Parameterset 2: 
+//Both the following are arrays starting at zero with length n_alleles*n_allels, 
+//and with row i and column j represented by mutationMatrixFemale[i+n_alleles*j]
+//double* mutationMatrixFemale 
+//double* mutationMatrixMale
+//The following indicates whether one should use the simplification that only one 
+//allele outside those existing in the data should be used in the computations. 
+//NOTE: If the probability of mutating TO an allele is independent of the allele one is 
+//mutating FROM (i.e., if in each column of the mutation matrices the off-diagonal elements 
+//are equal) then one should always use this, as the computations are still exact. 
+//However, as a simplification, the user may decide to use this even for other mutation matrices. 
+//Then, NON-SILENT alleles that do not occur in the data are collapsed into a single allele
+//in the dataprobmatrix: Probabilities for mutating FROM such a joint allele are approximated
+//as a weighted average of the probabilities of mutating FROM each constituent allele (weighted 
+//by the population frequencies). 
+//int simplifyMutationMatrix
+
+//OUTPUT from compute_dataprob(): 
+//int n_dataalleles //The number of alleles 
+//int* index //For an index i in the full system, index[i] gives the index in the "reduced" system.
+//double* dataprobability //Probabilities of the alleles in the "reduced" system. 
+//double** dataprobmatrixFemale //Mutation matrix for the reduced system
+//double** dataprobmatrixMale //Mutation matrix for the reduced system
+
+//////////////////////////////////////////////////////
+//**************************************************//
+//////////////////////////////////////////////////////
+
+
 void allelesystem::compute_dataprob() {
   dataitem* dit;
   int i,j;
@@ -492,14 +407,17 @@ void allelesystem::compute_dataprob() {
   delete[] index;
   
   index = new int[n_alleles];
-  //The number of alleles in the data matrix that does not 
-  //appear in the data (or as a silent allele): 
+  //The number of alleles in the system that does not 
+  //appear in the data or as a silent allele: 
   int nExtra=0; 
+  int* existsInData = new int[n_alleles]; 
+  double mysum; 
 
-  if (mutationModelFemale < 2 && mutationModelMale < 2)
+///////////////////////////////////////////////////
+
+  if (simplifyMutationMatrix)
   {
 	//First, find the alleles that appear in the data: 
-	int* existsInData = new int[n_alleles]; 
 	for (i=0; i<n_alleles; i++) existsInData[i] = 0;
 	for (i=0; i<n_alleles; i++) index[i] = 0; 
 	dit = data;
@@ -511,66 +429,29 @@ void allelesystem::compute_dataprob() {
 	if (hasSilentAllele) 
 		  existsInData[silentAllele] = 1;
 
-	//Determine whether an extra allele is needed: 
-	double sum = 0; 
 	for (i=0; i<n_alleles; i++)
-		if (existsInData[i]) sum += probability[i]; 
-	if (sum<1) nExtra = 1;  
-		
-	n_dataalleles = nExtra; 
-	//Find dataprobability and index: 
-	for (i=0; i<n_alleles; i++) if (existsInData[i]) index[i] = n_dataalleles++;
-	dataprobability = new double[n_dataalleles];
-	if (nExtra)
-	{
-		dataprobability[0] = 1;
-		for (i=0; i<n_alleles; i++) if (existsInData[i]) 
-			dataprobability[0] -= (dataprobability[index[i]] = probability[i]);
-	}
-	else
-	{
-		for (i=0; i<n_alleles; i++) if (existsInData[i])
-			dataprobability[index[i]] = probability[i];
-	}
-	delete[] existsInData; 
-
-//	//This may only happen because we have had "approximate" tests above, 
-//		//which we do to avoid numerical problems. Thus, this is a numerical 
-//	//adjustment: 
-//	if (dataprobability[0]<0)
-//	{
-//		 //Naughty: Renormalization: 
-//		for (i=1; i<n_dataalleles; i++)
-//		dataprobability[i] /= 1 - dataprobability[0]; 
-//		dataprobability[0] = 0; 
-//	}
-
-  
+		if (!existsInData[i]) nExtra++; 
   }
-	else
-	{
-		//Determine whether two extra alleles are needed:
-		double sum = 0;
-		for (i=0; i<n_alleles; i++)
-			sum += probability[i];
-		if (sum<1) nExtra = 2; 
-		n_dataalleles = n_alleles + nExtra; 
-		dataprobability = new double[n_dataalleles]; 
-		int offset = (sum<1); 
-		for (i=0; i<n_alleles; i++)
-		{
-			index[i] = i+offset; 
-			dataprobability[i+offset]=probability[i]; 
-		}
-		if (sum<1) 
-			dataprobability[0]=(dataprobability[n_dataalleles-1]=0.5*(1-sum)); 
-	}
- 
-  //We assume, for both male and female data:
-  //0<=mutationrate<1, n_possibilities >= n_dataalleles,
-  //and n_possibilities>=2. If n_possibilities==n_dataalleles,
-  //then dataprobability[0]==0.
 
+  if (nExtra>1) {
+    //The first allele will be the "collapsed" one: 
+    n_dataalleles = 1; 
+    //Find dataprobability and index: 
+    for (i=0; i<n_alleles; i++) if (existsInData[i]) index[i] = n_dataalleles++;
+    dataprobability = new double[n_dataalleles];
+    dataprobability[0] = 1;
+    for (i=0; i<n_alleles; i++) if (existsInData[i]) 
+				  dataprobability[0] -= (dataprobability[index[i]] = probability[i]);  
+  } else {
+    n_dataalleles = n_alleles; 
+    dataprobability = new double[n_dataalleles]; 
+    for (i=0; i<n_alleles; i++)
+      {
+	index[i] = i; 
+	dataprobability[i]=probability[i]; 
+      }
+  }
+ 
   dataprobmatrixFemale = new double*[n_dataalleles];
   dataprobmatrixMale   = new double*[n_dataalleles];
   for (i=0; i<n_dataalleles; i++) 
@@ -579,510 +460,56 @@ void allelesystem::compute_dataprob() {
      dataprobmatrixMale[i]   = new double[n_dataalleles];
   }
 
-  // Needed later: 
-  // (this "crossum" parameter should be independent of which of the two choices
-  // above that have been made)
-  double crossum = 0; 
-  double totalsum = 0; 
-  for (i=0; i<n_alleles; i++) 
-  {
-	  crossum += probability[i]*(1-probability[i]); 
-	  totalsum += probability[i]; 
-  }
-  crossum += (1-totalsum)*totalsum; //include also the last "extra" allele
-  if (crossum == 0) crossum = 1; //avoid numerical problems
-
-  //Given that a mutation happens, there is an equal probability of 
-  //ending up in each of the other possible alleles: 
-  if (mutationModelFemale==0)
-  {
-	  if (nExtra==0)
-	  {
-		  //At this point, we must have n_possibilities==n_alleles==n_dataalleles
-		  for (i=0; i<n_dataalleles; i++)
-			  for (j=0; j<n_dataalleles; j++)
-				  if (i==j)
-					  dataprobmatrixFemale[i][j] = 1-mutationrateFemale; 
-				  else
-					  dataprobmatrixFemale[i][j] = mutationrateFemale/
-					  (n_possibilities-1.0); 
-	  }
-	  else if (nExtra==1)
-	  {
-		  dataprobmatrixFemale[0][0] = 1.0 - mutationrateFemale*(n_dataalleles-1.0)/
-	      (n_possibilities-1.0);
-          for (i = 1; i<n_dataalleles; i++) 
-	          dataprobmatrixFemale[i][0] = mutationrateFemale*
-	          (1.0-(n_dataalleles-2.0)/(n_possibilities-1.0));
-          for (i = 0; i<n_dataalleles; i++) 
-	          for (j = 1; j<n_dataalleles; j++) 
-	              if (i==j) 
-	                  dataprobmatrixFemale[i][j] = 1.0 - mutationrateFemale;
-	              else
-	                  dataprobmatrixFemale[i][j] = mutationrateFemale/
-		              (n_possibilities-1.0);
-	  }
-	  else
-	  {
-		  for (i=0; i<n_dataalleles; i++)
-			  for (j=0; j<n_dataalleles; j++)
-				  if ((i==0 && j==0) || (i==n_dataalleles-1 && j==n_dataalleles-1))
-					  dataprobmatrixFemale[i][j] = 1-mutationrateFemale +
-					  0.5*mutationrateFemale*(n_possibilities-n_dataalleles)/
-					  (n_possibilities-1.0); 
-				  else if ((i==0 && j==n_dataalleles-1)||(i==n_dataalleles-1 && j==0))
-					  dataprobmatrixFemale[i][j] = 
-					  0.5*mutationrateFemale*(n_possibilities-n_dataalleles)/
-					  (n_possibilities-1.0); 
-				  else if (j==0 || j==n_dataalleles-1)
-					  dataprobmatrixFemale[i][j] = 
-					  0.5*mutationrateFemale*(n_possibilities-n_dataalleles+2.0)/
-					  (n_possibilities-1.0); 
-				  else if (i==j)
-					  dataprobmatrixFemale[i][j] = 
-					  1-mutationrateFemale; 
-				  else
-					  dataprobmatrixFemale[i][j] = 
-					  mutationrateFemale/(n_possibilities-1); 
-	  }
-  }
-  //Given that a mutation happens, the probability of ending up in 
-  //another allele is proportional to the frequency of that allele: 
-  else if (mutationModelFemale==1)
-  {
-    // Compute alpha: 
-	// 
-	// Gammelt:
-	//
-    // double sumsquare = 0; 
-    // double sum = 0; 
-    // for (i=1; i<n_dataalleles; i++)
-    // {
-	// sum += dataprobability[i]; 
-	// sumsquare += dataprobability[i]*dataprobability[i]; 
-    // }
-    // sumsquare += (1-sum)*(1-sum)/(n_possibilities-n_dataalleles+1); 
-	//
-	//double alpha = mutationrateFemale/(1-sumsquare); 
-	//
-	double alpha = mutationrateFemale/crossum; 
-
-	if (nExtra==0)
-	{
-		for (i=0; i<n_dataalleles; i++)
-			for (j=0; j<n_dataalleles; j++)
-				if (i==j)
-					dataprobmatrixFemale[i][j] = 1.0 - alpha + alpha*dataprobability[j]; 
-				else 
-					dataprobmatrixFemale[i][j] = alpha*dataprobability[j]; 
+  if (nExtra > 1) {
+    for (i=0; i<n_dataalleles; i++)
+      for (j=0; j<n_dataalleles; j++) {
+	dataprobmatrixFemale[i][j] = 0; 
+	dataprobmatrixMale[i][j] = 0; 
+      }
+    for (i=0; i<n_alleles; i++) {
+      if (existsInData[i]) {
+	for (j=0; j<n_alleles; j++) {
+	  dataprobmatrixFemale[index[i]][index[j]] = 
+	    dataprobmatrixFemale[index[i]][index[j]] + mutationMatrixFemale[i + j*n_alleles]; 
+	  dataprobmatrixMale[index[i]][index[j]] = 
+	    dataprobmatrixMale[index[i]][index[j]] + mutationMatrixMale[i + j*n_alleles]; 
 	}
-	else if (nExtra==1)
-	{
-		for (i=0; i<n_dataalleles; i++)
-		{
-			double tmpsum = 0; 
-			for (j=1; j<n_dataalleles; j++)
-				if (i==j)
-					tmpsum += (dataprobmatrixFemale[i][j] = 1.0 - alpha + alpha*dataprobability[j]); 
-				else
-					tmpsum += (dataprobmatrixFemale[i][j] = alpha*dataprobability[j]); 
-			dataprobmatrixFemale[i][0] = 1-tmpsum; 
-		}
+      } else {
+	for (j=0; j<n_alleles; j++) {
+	  dataprobmatrixFemale[0][index[j]] = 
+	    dataprobmatrixFemale[0][index[j]] + probability[i]*mutationMatrixFemale[i + j*n_alleles]; 
+	  dataprobmatrixMale[0][index[j]] = 
+	    dataprobmatrixMale[0][index[j]] + probability[i]*mutationMatrixMale[i + j*n_alleles]; 
 	}
-	else
-	{
-		for (i=0; i<n_dataalleles; i++)
-		{
-			double tmpsum = 0; 
-			for (j=1; j<n_dataalleles-1; j++)
-				if (i==j)
-					tmpsum += (dataprobmatrixFemale[i][j] = 1.0 - alpha + alpha*dataprobability[j]); 
-				else
-					tmpsum += (dataprobmatrixFemale[i][j] = alpha*dataprobability[j]); 
-			dataprobmatrixFemale[i][0] = dataprobmatrixFemale[i][n_dataalleles-1] = 0.5*(1-tmpsum); 
-		}
-	}
-  }
-  //Given that a mutation happens, the ratio of probabilities of ending up in 
-  //two different alleles is a constant to the power of the difference of
-  //their distances to the start allele:
-  else if (mutationModelFemale==2)
-  {
-	  for (i=0; i<n_dataalleles; i++)
-      {
-    	  double k = mutationrateFemale*(1-mutationRangeFemale)/
-	          mutationRangeFemale/(2-mypow(mutationRangeFemale, i)
-	          -mypow(mutationRangeFemale, n_dataalleles-i-1)); 
-		  for (j=0; j<n_dataalleles; j++)
-	          if (i==j)
-	              dataprobmatrixFemale[i][j] = 1-mutationrateFemale;  
-	          else if (j<i)
-	              dataprobmatrixFemale[i][j] = k*mypow(mutationRangeFemale, i-j); 
-	          else
-	              dataprobmatrixFemale[i][j] = k*mypow(mutationRangeFemale, j-i); 
-	  }
-
-
-//     //For simplicity, we first set up a full transition matrix for the
-//     //full set of alleles, and then derive the dataprobmatrix from it. 
-//	
-//	//Find out how many alleles to use: 
-//	  double probsum = 0; 
-//		for (i=0; i<n_alleles; i++) probsum += probability[i]; 
-//	  int nAllelesInRow = n_alleles + 2*(probsum<1) - hasSilentAllele;
-//	  
-//	  double** tmpMatrix = new double*[nAllelesInRow]; 
-//	  for (i=0; i<nAllelesInRow; i++)
-//	  {
-//		  tmpMatrix[i] = new double[nAllelesInRow]; 
-//		  double ki = mutationRateFemale*(1-mutationRangeFemale)/
-//			  mutationRangeFemale/(2.0-mypow(mutationRangeFemale, i-1)
-//			  -mypow(mutationRangeFemale, nAllelesInRow)); 
-//		  if (hasSilentAllele) ki *= (1-1/nAllelesInRow); 
-//		  for (j=0; j<nAllelesInRow)
-//			  if (i<j)
-//				tmpMatrix[i][j] = ki*mypow(mutationRangeFemale, j-i)
-//			  else if (i>j)
-//			    tmpMatrix[i][j] = ki*mypow(mutationRangeFemale, i-j)
-//			  else
-//			    tmpMatrix[i][j] = 1-mutationRateFemale; 
-//	  }
-
-
-//     //For now: 
-//     //For even more simplicity (and accuracy) we just use the full matrix
-//     delete[] dataprobability; 
-//     for (i=0; i<n_dataalleles; i++) 
-//	 delete[] dataprobmatrixFemale[i]; 
-//     delete[] dataprobmatrixFemale; 
-//
-//     double sum = 0; 
-//     for (i=0; i<n_alleles; i++)
-//	 sum += probability[i]; 
-//
-//     if (sum>=1)
-//     {
-//	n_dataalleles = n_alleles; 
-//	dataprobability = new double[n_dataalleles]; 
-//	for (i=0; i<n_alleles; i++)
-//	{
-//	   index[i] = i; 
-//	   dataprobability[i] = probability[i]; 
-//	}
-//
-//}
-//     else
-//     {
-//	n_dataalleles = n_alleles+2; 
-//	dataprobability = new double[n_dataalleles]; 
-//	dataprobability[n_dataalleles-1] = 
-//	   dataprobability[0] = 0.5*(1-sum); 
-//	for (i=0; i<n_alleles; i++)
-//	{
-//	   index[i] = i+1; 
-//	   dataprobability[i+1] = probability[i]; 
-//	}
-//     }
-//
-//     dataprobmatrixFemale  = new double*[n_dataalleles]; 
-//     for (i=0; i<n_dataalleles; i++)
-//     {
-//	dataprobmatrixFemale[i]  = new double[n_dataalleles]; 
-//	double k = mutationrateFemale*(1-mutationRangeFemale)/
-//	   mutationRangeFemale/
-//	   (2-mypow(mutationRangeFemale, i-1)
-//	    -mypow(mutationRangeFemale, n_dataalleles-i)); 
-//	for (j=0; j<n_dataalleles; j++)
-//	   if (i==j)
-//	      dataprobmatrixFemale[i][j] = 1-mutationrateFemale; 
-//	   else if (j<i)
-//	      dataprobmatrixFemale[i][j] = k*mypow(mutationRangeFemale, i-j); 
-//	   else
-//	      dataprobmatrixFemale[i][j] = k*mypow(mutationRangeFemale, j-i); 
-//     }
-  }
-  else //mutationModel==3
-  {
-	  double constant = mutationrateFemale*(1-mutationRangeFemale)*(1-mutationRangeFemale)/
-		  2.0/mutationRangeFemale/(n_dataalleles-mutationRangeFemale*n_dataalleles-1+
-		  mypow(mutationRangeFemale, n_dataalleles)); 
-	  double sum = 0; 
-	  for (i=0; i<n_dataalleles; i++)
-      {
-		  for (j=0; j<n_dataalleles; j++)
-			  if (i<j) {
-	              dataprobmatrixFemale[i][j] = constant/dataprobability[i]*
-				  mypow(mutationRangeFemale, j-i); 
-				  sum += dataprobmatrixFemale[i][j]; 
-			  }
-			  else if (j<i) {
-	              dataprobmatrixFemale[i][j] = constant/dataprobability[i]*
-				  mypow(mutationRangeFemale, i-j);
-				  sum += dataprobmatrixFemale[i][j]; 
-			  }
-		  dataprobmatrixFemale[i][i] = 1-sum; 
-	  }
+      }
+    }
+    mysum = 0; 
+    for (j=0; j<n_dataalleles; j++) mysum = mysum + dataprobmatrixFemale[0][j]; 
+    for (j=0; j<n_dataalleles; j++) dataprobmatrixFemale[0][j] = dataprobmatrixFemale[0][j]/mysum; 
+    mysum = 0; 
+    for (j=0; j<n_dataalleles; j++) mysum = mysum + dataprobmatrixMale[0][j]; 
+    for (j=0; j<n_dataalleles; j++) dataprobmatrixMale[0][j] = dataprobmatrixMale[0][j]/mysum; 
+  } else { 
+    for (i=0; i<n_dataalleles; i++)
+      for (j=0; j<n_dataalleles; j++) {
+	dataprobmatrixFemale[i][j] = mutationMatrixFemale[i+j*n_alleles]; 
+	dataprobmatrixMale[i][j] = mutationMatrixMale[i+j*n_alleles]; 
+      }
   }
 
-
-  //Given that a mutation happens, there is an equal probability of 
-  //ending up in each of the other possible alleles: 
-  if (mutationModelMale==0)
-  {
-	  if (nExtra==0)
-	  {
-		  //At this point, we must have n_possibilities==n_alleles==n_dataalleles
-		  for (i=0; i<n_dataalleles; i++)
-			  for (j=0; j<n_dataalleles; j++)
-				  if (i==j)
-					  dataprobmatrixMale[i][j] = 1-mutationrateMale; 
-				  else
-					  dataprobmatrixMale[i][j] = mutationrateMale/
-					  (n_possibilities-1.0); 
-	  }
-	  else if (nExtra==1)
-	  {
-		  dataprobmatrixMale[0][0] = 1.0 - mutationrateMale*(n_dataalleles-1.0)/
-	      (n_possibilities-1.0);
-          for (i = 1; i<n_dataalleles; i++) 
-	          dataprobmatrixMale[i][0] = mutationrateMale*
-	          (1.0-(n_dataalleles-2.0)/(n_possibilities-1.0));
-          for (i = 0; i<n_dataalleles; i++) 
-	          for (j = 1; j<n_dataalleles; j++) 
-	              if (i==j) 
-	                  dataprobmatrixMale[i][j] = 1.0 - mutationrateMale;
-	              else
-	                  dataprobmatrixMale[i][j] = mutationrateMale/
-		              (n_possibilities-1.0);
-	  }
-	  else
-	  {
-		  for (i=0; i<n_dataalleles; i++)
-			  for (j=0; j<n_dataalleles; j++)
-				  if ((i==0 && j==0) || (i==n_dataalleles-1 && j==n_dataalleles-1))
-					  dataprobmatrixMale[i][j] = 1-mutationrateMale +
-					  0.5*mutationrateMale*(n_possibilities-n_dataalleles)/
-					  (n_possibilities-1.0); 
-				  else if ((i==0 && j==n_dataalleles-1)||(i==n_dataalleles-1 && j==0))
-					  dataprobmatrixMale[i][j] = 
-					  0.5*mutationrateMale*(n_possibilities-n_dataalleles)/
-					  (n_possibilities-1.0); 
-				  else if (j==0 || j==n_dataalleles-1)
-					  dataprobmatrixMale[i][j] = 
-					  0.5*mutationrateMale*(n_possibilities-n_dataalleles+2.0)/
-					  (n_possibilities-1.0); 
-				  else if (i==j)
-					  dataprobmatrixMale[i][j] = 
-					  1-mutationrateMale; 
-				  else
-					  dataprobmatrixMale[i][j] = 
-					  mutationrateMale/(n_possibilities-1); 
-	  }
-  }
-  //Given that a mutation happens, the probability of ending up in 
-  //another allele is proportional to the frequency of that allele: 
-  else if (mutationModelMale==1)
-  {
-	double alpha = mutationrateMale/crossum; 
-	if (nExtra==0)
-	{
-		for (i=0; i<n_dataalleles; i++)
-			for (j=0; j<n_dataalleles; j++)
-				if (i==j)
-					dataprobmatrixMale[i][j] = 1.0 - alpha + alpha*dataprobability[j]; 
-				else 
-					dataprobmatrixMale[i][j] = alpha*dataprobability[j]; 
-	}
-	else if (nExtra==1)
-	{
-		for (i=0; i<n_dataalleles; i++)
-		{
-			double tmpsum = 0; 
-			for (j=1; j<n_dataalleles; j++)
-				if (i==j)
-					tmpsum += (dataprobmatrixMale[i][j] = 1.0 - alpha + alpha*dataprobability[j]); 
-				else
-					tmpsum += (dataprobmatrixMale[i][j] = alpha*dataprobability[j]); 
-			dataprobmatrixMale[i][0] = 1-tmpsum; 
-		}
-	}
-	else
-	{
-		for (i=0; i<n_dataalleles; i++)
-		{
-			double tmpsum = 0; 
-			for (j=1; j<n_dataalleles-1; j++)
-				if (i==j)
-					tmpsum += (dataprobmatrixMale[i][j] = 1.0 - alpha + alpha*dataprobability[j]); 
-				else
-					tmpsum += (dataprobmatrixMale[i][j] = alpha*dataprobability[j]); 
-			dataprobmatrixMale[i][0] = dataprobmatrixMale[i][n_dataalleles-1] = 0.5*(1-tmpsum); 
-		}
-	}
-  }
-  //Given that a mutation happens, the ratio of probabilities of ending up in 
-  //two different alleles is a constant to the power of the difference of
-  //their distances to the start allele:
-  else if (mutationModelMale==2)
-  {
-	  for (i=0; i<n_dataalleles; i++)
-      {
-    	  double k = mutationrateMale*(1-mutationRangeMale)/
-	          mutationRangeMale/(2-mypow(mutationRangeMale, i)
-	          -mypow(mutationRangeMale, n_dataalleles-i-1)); 
-	      for (j=0; j<n_dataalleles; j++)
-	          if (i==j)
-	              dataprobmatrixMale[i][j] = 1-mutationrateMale;  
-	          else if (j<i)
-	              dataprobmatrixMale[i][j] = k*mypow(mutationRangeMale, i-j); 
-	          else
-	              dataprobmatrixMale[i][j] = k*mypow(mutationRangeMale, j-i); 
-	  }
-  }
-  else //mutationModel==3
-  {
-	  double constant = mutationrateMale*(1-mutationRangeMale)*(1-mutationRangeMale)/
-		  2.0/mutationRangeMale/(n_dataalleles-mutationRangeMale*n_dataalleles-1+
-		  mypow(mutationRangeMale, n_dataalleles)); 
-	  double sum = 0; 
-	  for (i=0; i<n_dataalleles; i++)
-      {
-		  for (j=0; j<n_dataalleles; j++)
-			  if (i<j) {
-	              dataprobmatrixMale[i][j] = constant/dataprobability[i]*
-				  mypow(mutationRangeMale, j-i); 
-				  sum += dataprobmatrixMale[i][j]; 
-			  }
-			  else if (j<i) {
-	              dataprobmatrixMale[i][j] = constant/dataprobability[i]*
-				  mypow(mutationRangeMale, i-j);
-				  sum += dataprobmatrixMale[i][j]; 
-			  }
-		  dataprobmatrixMale[i][i] = 1-sum; 
-	  }
-  }
-*/
-
-
-/*
-  //Given that a mutation happens, there is an equal probability of 
-  //ending up in each of the other possible alleles: 
-  if (mutationModelMale==0)
-  {
-     dataprobmatrixMale[0][0] = 1.0 - mutationrateMale*(n_dataalleles-1.0)/
-	(n_possibilities-1.0);
-     for (i = 1; i<n_dataalleles; i++) 
-	dataprobmatrixMale[i][0] = mutationrateMale*
-	   (1.0-(n_dataalleles-2.0)/(n_possibilities-1.0));
-     for (i = 0; i<n_dataalleles; i++) 
-	for (j = 1; j<n_dataalleles; j++) 
-	   if (i==j) 
-	      dataprobmatrixMale[i][j] = 1.0 - mutationrateMale;
-	   else
-	      dataprobmatrixMale[i][j] = mutationrateMale/
-		 (n_possibilities-1.0);
-  }
-  //Given that a mutation happens, the probability of ending up in 
-  //another allele is proportional to the frequency of that allele: 
-  else if (mutationModelMale==1)
-  {
-     //Compute alpha: 
-     //
-	 // GAMMELT:
-	 // double sumsquare = 0; 
-     // double sum = 0; 
-     // for (i=1; i<n_dataalleles; i++)
-     // {
-	 // sum += dataprobability[i]; 
-	 // sumsquare += dataprobability[i]*dataprobability[i]; 
-     // }
-     // sumsquare += (1-sum)*(1-sum)/(n_possibilities-n_dataalleles+1); 
-     // double alpha = mutationrateMale/(1-sumsquare); 
-	 //
-	 double alpha = mutationrateMale/crossum; 
-
-     for (i=0; i<n_dataalleles; i++)
-	for (j=0; j<n_dataalleles; j++)
-	   if (i==j)
-	      dataprobmatrixMale[i][j] = 1.0 - alpha + alpha*dataprobability[j]; 
-	   else
-	      dataprobmatrixMale[i][j] = alpha*dataprobability[j]; 
-  }
-  //Given that a mutation happens, the ratio of probabilities of ending up in 
-  //two different alleles is a constant to the power of the difference of
-  //their distances to the start allele:
-  else //mutationModel==2
-  {
-     //For simplicity, we first set up a full transition matrix for the
-     //full set of alleles, and then derive the dataprobmatrix from it. 
-     
-
-     //For now: 
-     //For even more simplicity (and accuracy) we just use the full matrix
-     delete[] dataprobability; 
-     for (i=0; i<n_dataalleles; i++) 
-	delete[] dataprobmatrixMale[i]; 
-     delete[] dataprobmatrixMale; 
-
-     double sum = 0; 
-     for (i=0; i<n_alleles; i++)
-	sum += probability[i]; 
-
-     if (sum>=1)
-     {
-	n_dataalleles = n_alleles; 
-	dataprobability = new double[n_dataalleles]; 
-	for (i=0; i<n_alleles; i++)
-	{
-	   index[i] = i; 
-	   dataprobability[i] = probability[i]; 
-	}
-
-     }
-     else
-     {
-	n_dataalleles = n_alleles+2; 
-	dataprobability = new double[n_dataalleles]; 
-	dataprobability[n_dataalleles-1] = 
-	   dataprobability[0] = 0.5*(1-sum); 
-	for (i=0; i<n_alleles; i++)
-	{
-	   index[i] = i+1; 
-	   dataprobability[i+1] = probability[i]; 
-	}
-     }
-
-     dataprobmatrixMale  = new double*[n_dataalleles]; 
-     for (i=0; i<n_dataalleles; i++)
-     {
-	dataprobmatrixMale[i]  = new double[n_dataalleles]; 
-	double k = mutationrateMale*(1-mutationRangeMale)/
-	   mutationRangeMale/
-	   (2-mypow(mutationRangeMale, i-1)
-	    -mypow(mutationRangeMale, n_dataalleles-i)); 
-	for (j=0; j<n_dataalleles; j++)
-	   if (i==j)
-	      dataprobmatrixMale[i][j] = 1-mutationrateMale; 
-	   else if (j<i)
-	      dataprobmatrixMale[i][j] = k*mypow(mutationRangeMale, i-j); 
-	   else
-	      dataprobmatrixMale[i][j] = k*mypow(mutationRangeMale, j-i); 
-     }
-  }
-*/
-
-/*
-  //Midlertidig utskrift av transisjonsmatrise: 
-  //printMutMatrix(); 
-
+  delete[] existsInData; 
   recalc_data = 0;
 }
 
-*/
 
 
 
-//New version, after deciding that all systems should have sum of frequencies equal to 1:
+//////////////////////////////////////////////////////
+//**************************************************//
+//////////////////////////////////////////////////////
+
+/*
+//Version after deciding that all systems should have sum of frequencies equal to 1:
 void allelesystem::compute_dataprob() {
   dataitem* dit;
   int i,j;
@@ -1247,29 +674,6 @@ void allelesystem::compute_dataprob() {
 	                  dataprobmatrixFemale[i][j] = mutationrateFemale/
 		              (n_possibilities-1.0);
 	  }
-//	  else
-//	  {
-//		  for (i=0; i<n_dataalleles; i++)
-//			  for (j=0; j<n_dataalleles; j++)
-//				  if ((i==0 && j==0) || (i==n_dataalleles-1 && j==n_dataalleles-1))
-//					  dataprobmatrixFemale[i][j] = 1-mutationrateFemale +
-//					  0.5*mutationrateFemale*(n_possibilities-n_dataalleles)/
-//					  (n_possibilities-1.0); 
-//				  else if ((i==0 && j==n_dataalleles-1)||(i==n_dataalleles-1 && j==0))
-//					  dataprobmatrixFemale[i][j] = 
-//					  0.5*mutationrateFemale*(n_possibilities-n_dataalleles)/
-//					  (n_possibilities-1.0); 
-//				  else if (j==0 || j==n_dataalleles-1)
-//					  dataprobmatrixFemale[i][j] = 
-//					  0.5*mutationrateFemale*(n_possibilities-n_dataalleles+2.0)/
-//					  (n_possibilities-1.0); 
-//				  else if (i==j)
-//					  dataprobmatrixFemale[i][j] = 
-//					  1-mutationrateFemale; 
-//				  else
-//					  dataprobmatrixFemale[i][j] = 
-//					  mutationrateFemale/(n_possibilities-1); 
-//	  }
   }
   //Given that a mutation happens, the probability of ending up in 
   //another allele is proportional to the frequency of that allele: 
@@ -1299,19 +703,6 @@ void allelesystem::compute_dataprob() {
 			dataprobmatrixFemale[i][0] = 1-tmpsum; 
 		}
 	}
-//	else
-//	{
-//		for (i=0; i<n_dataalleles; i++)
-//		{
-//			double tmpsum = 0; 
-//			for (j=1; j<n_dataalleles-1; j++)
-//				if (i==j)
-//					tmpsum += (dataprobmatrixFemale[i][j] = 1.0 - alpha + alpha*dataprobability[j]); 
-//				else
-//					tmpsum += (dataprobmatrixFemale[i][j] = alpha*dataprobability[j]); 
-//			dataprobmatrixFemale[i][0] = dataprobmatrixFemale[i][n_dataalleles-1] = 0.5*(1-tmpsum); 
-//		}
-//	}
   }
   //Given that a mutation happens, the ratio of probabilities of ending up in 
   //two different alleles is a constant to the power of the difference of
@@ -1387,29 +778,6 @@ void allelesystem::compute_dataprob() {
 	                  dataprobmatrixMale[i][j] = mutationrateMale/
 		              (n_possibilities-1.0);
 	  }
-//	  else
-//	  {
-//		  for (i=0; i<n_dataalleles; i++)
-//			  for (j=0; j<n_dataalleles; j++)
-//				  if ((i==0 && j==0) || (i==n_dataalleles-1 && j==n_dataalleles-1))
-//					  dataprobmatrixMale[i][j] = 1-mutationrateMale +
-//					  0.5*mutationrateMale*(n_possibilities-n_dataalleles)/
-//					  (n_possibilities-1.0); 
-//				  else if ((i==0 && j==n_dataalleles-1)||(i==n_dataalleles-1 && j==0))
-//					  dataprobmatrixMale[i][j] = 
-//					  0.5*mutationrateMale*(n_possibilities-n_dataalleles)/
-//					  (n_possibilities-1.0); 
-//				  else if (j==0 || j==n_dataalleles-1)
-//					  dataprobmatrixMale[i][j] = 
-//					  0.5*mutationrateMale*(n_possibilities-n_dataalleles+2.0)/
-//					  (n_possibilities-1.0); 
-//				  else if (i==j)
-//					  dataprobmatrixMale[i][j] = 
-//					  1-mutationrateMale; 
-//				  else
-//					  dataprobmatrixMale[i][j] = 
-//					  mutationrateMale/(n_possibilities-1); 
-//	  }
   }
   //Given that a mutation happens, the probability of ending up in 
   //another allele is proportional to the frequency of that allele: 
@@ -1438,19 +806,6 @@ void allelesystem::compute_dataprob() {
 			dataprobmatrixMale[i][0] = 1-tmpsum; 
 		}
 	}
-//	else
-//	{
-//		for (i=0; i<n_dataalleles; i++)
-//		{
-//			double tmpsum = 0; 
-//			for (j=1; j<n_dataalleles-1; j++)
-//				if (i==j)
-//					tmpsum += (dataprobmatrixMale[i][j] = 1.0 - alpha + alpha*dataprobability[j]); 
-//				else
-//					tmpsum += (dataprobmatrixMale[i][j] = alpha*dataprobability[j]); 
-//			dataprobmatrixMale[i][0] = dataprobmatrixMale[i][n_dataalleles-1] = 0.5*(1-tmpsum); 
-//		}
-//	}
   }
   //Given that a mutation happens, the ratio of probabilities of ending up in 
   //two different alleles is a constant to the power of the difference of
@@ -1501,56 +856,7 @@ void allelesystem::compute_dataprob() {
   recalc_data = 0;
 }
 
-
-
-
-
-void allelesystem::printMutMatrix()
-{
-   int i; 
-   int* invindex = new int[n_dataalleles]; 
-   for (i=0; i<n_dataalleles; i++)
-      invindex[i] = -1; 
-   for (i=0; i<n_alleles; i++)
-      if (invindex[index[i]]>=0)
-	 invindex[index[i]] = 0; 
-      else
-	 invindex[index[i]] = i+1; 
-   
-   ofstream of1("MutModelFemale.txt"); 
-   ofstream of2("MutModelMale.txt"); 
-   if (of1.good() && of2.good())
-   {
-      of1<<"     "; 
-      of2<<"     "; 
-      for (i=0; i<n_dataalleles; i++)
-      {
-	 of1.width(12); 
-	 of2.width(12); 
-	 of1<<invindex[i]; 
-	 of2<<invindex[i]; 
-      }
-      of1<<'\n'; 
-      of2<<'\n'; 
-      for (i=0; i<n_dataalleles; i++)
-      {
-	 of1.width(3); 
-	 of2.width(3); 
-	 of1<<invindex[i]<<"  "; 
-	 of2<<invindex[i]<<"  "; 
-	 for (int j=0; j<n_dataalleles; j++)
-	 {
-	    of1.width(12); 
-	    of2.width(12); 
-	    of1<<dataprobmatrixFemale[i][j]; 
-	    of2<<dataprobmatrixMale[i][j]; 
-	 }
-	 of1<<'\n'; 
-	 of2<<'\n'; 
-      }
-   }
-   delete[] invindex; 
-}
+*/
 
 void allelesystem::execute(family& fam, 
 			   int info, 
@@ -1579,26 +885,18 @@ void allelesystem::execute(family& fam,
    result = fam.execute(sd, error);
    if (error) 
    {
-// Removed 2012-03-08
-//      if (info>0)
-//	 cout<<"ERROR: Too many people in some cutsets for allele system "
-//	     <<Systemname<<".\n";
    } 
    else 
    {
-// Removed 2012-03-08
-//      if (info>1) 
-//	 cout<<"Finished computations for system "<<Systemname<<".\n";
    }
    fam.remove_data();
 }
 
 void allelesystem::write_freq(ostream& out) {
     out<<separator<<"ALLELE SYSTEM "<<Systemname<<'\n'<<separator;
-    out<<"\nMutation probability: "<<0.5*(mutationrateFemale+mutationrateMale);
-//    if (mutationrateFemale+mutationrateMale>0)
-//	out<<", number of possible alleles: "<<n_possibilities<<"\n\n";
-//    else out<<"\n\n";         
+
+    //AS THIS ROUTINE IS NO LONGER USED, I REMOVED THE FOLLOWING LINE 2014-07-23: 
+    //    out<<"\nMutation probability: "<<0.5*(mutationrateFemale+mutationrateMale);
 	out<<"\n\n";
 
     if (n_alleles) {
