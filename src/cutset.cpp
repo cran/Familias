@@ -542,7 +542,24 @@ int cutset::add_tables(int n_alleles) {
 }
 
 void cutset::remove_tables() {
-  delete[] tab;
+
+  ////////////////////////////////////////////////////////
+  // THE COMMAND BELOW HAS BEEN CHANGED IN ORDER TO REMOVE 
+  // A BUG CONCERNING MEMORY MANAGEMENT. 
+  // The change is according to a suggestion by Prof. Brian Ripley. 
+  // He writes: 
+  // You need to use
+  // either C or C++ methods of (de)allocation, not mix them.  
+  //
+  // changed 2014-08-01 by Petter Mostad
+  //////////////////////////////////////////////////
+
+  free(tab); //delete[] tab;
+
+  ///////////////////////////////////////////////
+  ///////////////////////////////////////////////
+
+
   branch* br = get_first_branch();
   while (br) {
     br->remove_tables();

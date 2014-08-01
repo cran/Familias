@@ -1,6 +1,7 @@
 useDynLib(Familias)
 import(paramlink)
 export(FamiliasLocus)
+export(FamiliasPedigree)
 export(FamiliasPrior)
 export(FamiliasPosterior)
 export(ConvertPed)

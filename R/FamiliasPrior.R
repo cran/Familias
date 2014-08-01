@@ -1,13 +1,13 @@
 FamiliasPrior <- function (pedigrees, generationsParameter = 1, inbreedingParameter = 1, partnerParameter = 1, maxGenerations) 
 {
    if (missing(pedigrees) || length(pedigrees)<1)
-      stop("The input must be a pedigree or a list of pedigree objects") 
-   if (class(pedigrees)=="pedigree") pedigrees <- list(pedigrees)
+      stop("The pedigrees parameter must be an object of type 'pedigree' or 'FamiliasPedigree', or a list of such.") 
+   if (class(pedigrees)=="pedigree" | class(pedigrees)=="FamiliasPedigree") pedigrees <- list(pedigrees)
    if (class(pedigrees)!="list")
-      stop("The input must be a pedigree or a list of pedigree objects")
+      stop("The pedigrees parameter must be an object of type 'pedigree' or 'FamiliasPedigree', or a list of such.") 
    for (i in pedigrees) {
-       if (class(i)!="pedigree")
-          stop("The input must be a pedigree or a list of pedigree objects")
+       if (class(i)!="pedigree" && class(i)!="FamiliasPedigree")
+          stop("The pedigrees parameter must be an object of type 'pedigree' or 'FamiliasPedigree', or a list of such.") 
    }
    npeds <- length(pedigrees)
    firstped <- pedigrees[[1]]
@@ -128,5 +128,9 @@ FamiliasPrior <- function (pedigrees, generationsParameter = 1, inbreedingParame
       stop("ERROR: All pedigrees have probability zero.\n")
    if (any(result$redundant))
       stop("Error: some pedigrees are duplicate, remove duplicates")
+
+   #NewFamilias()
+   .C("NewFamilias")
+
    result$probabilities
 }

@@ -1,13 +1,13 @@
 FamiliasPosterior <- function (pedigrees, loci, datamatrix, prior, ref = 1, kinship = 0, simplifyMutations = FALSE) 
 {
    if (missing(pedigrees) || length(pedigrees)<1)
-      stop("The input must be a pedigree or a list of pedigree objects") 
-   if (class(pedigrees)=="pedigree") pedigrees <- list(pedigrees)
+      stop("The pedigrees parameter must be an object of type 'pedigree' or 'FamiliasPedigree', or a list of such.") 
+   if (class(pedigrees)=="pedigree" | class(pedigrees)=="FamiliasPedigree") pedigrees <- list(pedigrees)
    if (class(pedigrees)!="list")
-      stop("The input must be a pedigree or a list of pedigree objects")
+      stop("The pedigrees parameter must be an object of type 'pedigree' or 'FamiliasPedigree', or a list of such.") 
    for (i in pedigrees) {
-       if (class(i)!="pedigree")
-          stop("The input must be a pedigree or a list of pedigree objects")
+       if (class(i)!="pedigree" && class(i)!="FamiliasPedigree")
+          stop("The pedigrees parameter must be an object of type 'pedigree' or 'FamiliasPedigree', or a list of such.") 
    }
    npeds <- length(pedigrees)
    if (ref < 1 | ref > npeds) 
@@ -17,8 +17,8 @@ FamiliasPosterior <- function (pedigrees, loci, datamatrix, prior, ref = 1, kins
       prior <- rep(1/npeds, npeds)
    if (length(prior)!=npeds)
       stop("The prior argument must be a vector of the same length as the number of pedigrees, if it is not missing")
-   if (any(prior<0) || round(sum(prior), 6)!=1) #Changed Thore. Changed <= to < 
-      stop("The prior must consist of non-negative numbers summing to 1") #Changed Thore
+   if (any(prior<0) || round(sum(prior), 6)!=1) 
+      stop("The prior must consist of non-negative numbers summing to 1") 
 
    if(missing(datamatrix)) 
       stop("The datamatrix must be supplied")
@@ -32,9 +32,9 @@ FamiliasPosterior <- function (pedigrees, loci, datamatrix, prior, ref = 1, kins
    firstped <- pedigrees[[1]]
    for (i in 1:npeds)
       for (j in 1:npers) {
-         indextable[j,i] <- match(persons[j], pedigrees[[i]]$id)
+         indextable[j,i] <- match(persons[j], pedigrees[[i]]$id, nomatch = 0)
          if (indextable[j,i]==0)
-            stop(paste("Error:", persons[j], "does not occur in pedigree", i))
+            stop(paste("Error: Person ", persons[j], "of the data matrix does not occur in pedigree", i))
          if (i>1) {
             if (pedigrees[[i]]$sex[indextable[j,i]] != firstped$sex[indextable[j,1]])
                stop("Persons common to all pedigrees must have the same sex in all pedigrees!")
@@ -188,10 +188,10 @@ FamiliasPosterior <- function (pedigrees, loci, datamatrix, prior, ref = 1, kins
             if (is.na(A2)) A2 <- A1
             M1 <- match(A1, names(loci[[i]]$alleles), nomatch=0)
             if (M1==0)
-               stop(paste("Allele", M1, "is not found in locus", loci[[i]]$locusname))
+               stop(paste("Allele", A1, "is not found in locus", loci[[i]]$locusname))
             M2 <- match(A2, names(loci[[i]]$alleles), nomatch=0)
             if (M2==0)
-               stop(paste("Allele", M2, "is not found in locus", loci[[i]]$locusname))
+               stop(paste("Allele", A2, "is not found in locus", loci[[i]]$locusname))
 
          result <- .C("AddDNAObservation", as.integer(j - 1), 
 			as.integer(i - 1), 
@@ -238,6 +238,10 @@ FamiliasPosterior <- function (pedigrees, loci, datamatrix, prior, ref = 1, kins
    posterior <- posterior/sum(posterior)
    LR <- likelihoods/likelihoods[ref]
    LRperMarker <- likelihoodsPerSystem/likelihoodsPerSystem[,ref]
+
+   #NewFamilias()
+   .C("NewFamilias")
+
    list(posterior=posterior, prior=prior, LR = LR, LRperMarker = LRperMarker, likelihoods=likelihoods, likelihoodsPerSystem=likelihoodsPerSystem)
 }
 

@@ -19,7 +19,7 @@ inbreedingParameter = 1, partnerParameter = 1, maxGenerations)
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{pedigrees}{
-A list of pedigree objects
+A list of objects of class either 'pedigree' or 'FamiliasPedigree'
 }
   \item{generationsParameter}{
 Non-negative real. A value of 1 
