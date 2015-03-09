@@ -32,11 +32,14 @@ For more information, see www.familias.name
 \keyword{ package }
 \examples{
 persons <- c("mother", "daughter", "AF")
-ped1 <- pedigree(id=persons, dadid=c(NA, "AF", NA), momid=c(NA, "mother", NA), 
+ped1 <- FamiliasPedigree(id=persons, dadid=c(NA, "AF", NA), 
+momid=c(NA, "mother", NA), 
 sex=c("female", "female", "male"))
-ped2 <- pedigree(id=c(persons, "TF"), dadid=c(NA, "TF", NA, NA), momid=c(NA, "mother", NA, NA), 
+ped2 <- FamiliasPedigree(id=c(persons, "TF"), dadid=c(NA, "TF", NA, NA), 
+momid=c(NA, "mother", NA, NA), 
 sex=c("female", "female", "male", "male"))
-ped3 <- pedigree(id=c(persons, "TF", "gf", "gm"), dadid = c(NA, "TF", "gf", "gf", NA, NA), 
+ped3 <- FamiliasPedigree(id=c(persons, "TF", "gf", "gm"), 
+dadid = c(NA, "TF", "gf", "gf", NA, NA), 
 momid=c(NA, "mother", "gm", "gm", NA, NA), 
 sex=c("female", "female", "male", "male", "male", "female"))
 par(mfrow=c(3,1))
@@ -47,10 +50,11 @@ par(mfrow=c(1,1))
 mypedigrees <- list(isFather = ped1, unrelated=ped2, isUncle = ped3)
 locus1 <- FamiliasLocus(frequencies=c(0.1, 0.2, 0.3, 0.4), name="locus1", 
 allelenames= c("A", "B", "C", "D"))
-locus2 <- FamiliasLocus(c(0.2, 0.3, 0.5), "loc2", c(17, 18, 19), femaleMutationRate = 0.05)
+locus2 <- FamiliasLocus(c(0.2, 0.3, 0.5), "loc2", c(17, 18, 19), 
+femaleMutationRate = 0.05)
 myloci <- list(locus1, locus2)
 datamatrix <- data.frame(locus1.1=c("A", "A", "A"), locus1.2=c("B", "B", "C"), 
 locus2.1=c(17, 19, 19), locus2.2=c(18, 18, 18))
 rownames(datamatrix) <- persons
-result=FamiliasPosterior(mypedigrees, myloci, datamatrix)
+FamiliasPosterior(mypedigrees, myloci, datamatrix)
 }

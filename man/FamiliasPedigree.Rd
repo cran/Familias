@@ -40,10 +40,7 @@ in the sense that persons are allowed to have exactly one parent present in the 
 This generalization is necessary for the Familias package, as results from the \code{FamiliasPosterior}
 function may change when a single ancestor (father or mother) is added to a single person in a
 pedigree. Such changes may occur when a non-zero mutation rate is used together with a non-stable 
-mutation model. In cases where this issue is important, users are recommended to use the 
-'FamiliasPedigree' function. Otherwise, the recommendation is to use the 'pedigree' function of
-'kinship2', as more functions, such as plotting, are then available. The 
-\code{FamiliasPosterior} and \code{FamiliasPrior} functions can use either pedigree type as input. 
+mutation model. The \code{FamiliasPosterior} and \code{FamiliasPrior} functions can use either pedigree type as input. 
 }
 \value{
 A list of class \code{FamiliasPedigree} containing 
@@ -58,10 +55,11 @@ Petter Mostad mostad@chalmers.se
 
 \examples{
 #A nuclear family of three: 
-FamiliasPedigree(c("mother", "father", "child"), 
-                 c(NA, NA, "father"), 
-                 c(NA, NA, "mother"), 
-                 c("female", "male", "female"))
+ped <- FamiliasPedigree(c("mother", "father", "child"), 
+                        c(NA, NA, "father"), 
+                        c(NA, NA, "mother"), 
+                        c("female", "male", "female"))
+plot(ped, symbolsize = 2, cex = 2, family = "mono")
 
 #Generating the two pedigrees needed for a traditional paternity case
 ped1 <- FamiliasPedigree(c("mother", "child", "AF"), 
