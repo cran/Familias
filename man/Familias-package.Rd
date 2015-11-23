@@ -48,9 +48,9 @@ plot(ped2);title("ped2, i.e., AF is unrelated")
 plot(ped3);title("ped3, i.e., AF is uncle")
 par(mfrow=c(1,1))
 mypedigrees <- list(isFather = ped1, unrelated=ped2, isUncle = ped3)
-locus1 <- FamiliasLocus(frequencies=c(0.1, 0.2, 0.3, 0.4), name="locus1", 
-allelenames= c("A", "B", "C", "D"))
-locus2 <- FamiliasLocus(c(0.2, 0.3, 0.5), "loc2", c(17, 18, 19), 
+locus1 <- FamiliasLocus(frequencies=c(0.1, 0.2, 0.3, 0.4), 
+allelenames= c("A", "B", "C", "D"), name="locus1")
+locus2 <- FamiliasLocus(c(0.2, 0.3, 0.5), c(17, 18, 19), "loc2",  
 femaleMutationRate = 0.05)
 myloci <- list(locus1, locus2)
 datamatrix <- data.frame(locus1.1=c("A", "A", "A"), locus1.2=c("B", "B", "C"), 

@@ -14,18 +14,18 @@ FamiliasPosterior <- function (pedigrees, loci, datamatrix, prior, ref = 1, kins
     }
     npeds <- length(pedigrees)
     if (ref < 1 | ref > npeds) 
-        stop("Impossible reference pedigree index")
+        stop("Impossible reference pedigree index.")
     if (missing(prior)) 
         prior <- rep(1/npeds, npeds)
     if (length(prior) != npeds) 
-        stop("The prior argument must be a vector of the same length as the number of pedigrees, if it is not missing")
+        stop("The prior argument must be a vector of the same length as the number of pedigrees, if it is not missing.")
     if (any(prior < 0) || round(sum(prior), 6) != 1) 
-        stop("The prior must consist of non-negative numbers summing to 1")
+        stop("The prior must consist of non-negative numbers summing to 1.")
     if (missing(datamatrix)) 
-        stop("The datamatrix must be supplied")
+        stop("The datamatrix must be supplied.")
     persons <- rownames(datamatrix)
     if (length(persons) < 1) 
-        stop("The row names of the datamatrix must contain the names of the persons you have data for")
+        stop("The row names of the datamatrix must contain the names of the persons you have data for.")
     npers <- length(persons)
     indextable <- matrix(0, npers, npeds)
     firstped <- pedigrees[[1]]
@@ -47,7 +47,7 @@ FamiliasPosterior <- function (pedigrees, loci, datamatrix, prior, ref = 1, kins
             1]] == "female")), as.integer(-1), as.integer(FALSE), 
             index = integer(1), error = integer(1))
         if (result$error > 0) 
-            stop("ERROR: Problems with common persons in pedigree")
+            stop("ERROR: Problems with common persons in pedigree.")
     }
     for (i in pedigrees) {
         nPersons <- length(i$sex)
@@ -76,7 +76,7 @@ FamiliasPosterior <- function (pedigrees, loci, datamatrix, prior, ref = 1, kins
         result <- .C("AddPedigree", as.integer(nExFemales), as.integer(nExMales), 
             index = integer(1), error = integer(1))
         if (result$error > 0) 
-            stop("ERROR: Wrong input in pedigrees")
+            stop("ERROR: Wrong input in pedigrees.")
         index <- result$index + 1
         for (j in 1:nPersons) {
             if (i$findex[j] > 0) {
@@ -84,40 +84,40 @@ FamiliasPosterior <- function (pedigrees, loci, datamatrix, prior, ref = 1, kins
                   1), as.integer(neworder[j] - 1), as.integer(index - 
                   1), error = integer(1))
                 if (result$error == 1) 
-                  stop("ERROR: Wrong input")
+                  stop("ERROR: Wrong input.")
                 else if (result$error == 2) 
-                  stop("ERROR: Illegal relation based on Year-of-birth or is-Child data")
+                  stop("ERROR: Illegal relation based on Year-of-birth or is-Child data.")
                 else if (result$error == 3) 
-                  stop("ERROR: Cycle in the pedigree or duplicate parent")
+                  stop("ERROR: Cycle in the pedigree or duplicate parent.")
             }
             if (i$mindex[j] > 0) {
                 result <- .C("AddRelation", as.integer(neworder[i$mindex[j]] - 
                   1), as.integer(neworder[j] - 1), as.integer(index - 
                   1), error = integer(1))
                 if (result$error == 1) 
-                  stop("ERROR: Wrong input")
+                  stop("ERROR: Wrong input.")
                 else if (result$error == 2) 
-                  stop("ERROR: Illegal relation based on Year-of-birth or is-Child data")
+                  stop("ERROR: Illegal relation based on Year-of-birth or is-Child data.")
                 else if (result$error == 3) 
-                  stop("ERROR: Cycle in the pedigree or duplicate parent")
+                  stop("ERROR: Cycle in the pedigree or duplicate parent.")
             }
         }
     }
     if (missing(loci) || length(loci) < 1) 
-        stop("The loci argument must be a FamiliasLocus object or a list of such")
+        stop("The loci argument must be a FamiliasLocus object or a list of such.")
     if (class(loci) == "FamiliasLocus") 
         loci <- list(loci)
     if (class(loci) != "list") 
-        stop("The loci argument must be a FamiliasLocus object or a list of such")
+        stop("The loci argument must be a FamiliasLocus object or a list of such.")
     nloci <- length(loci)
     nms <- rep("", nloci)
     for (i in 1:nloci) {
         if (class(loci[[i]]) != "FamiliasLocus") 
-            stop("The loci argument must be a FamiliasLocus object or a list of such")
+            stop("The loci argument must be a FamiliasLocus object or a list of such.")
         nms[i] <- loci[[i]]$locusname
     }
     if (anyDuplicated(nms)) 
-        stop("There can be no duplicated names of the loci")
+        stop("There can be no duplicated names of the loci.")
     for (i in loci) {
         if (any(i$alleles <= 0)) 
             stop(paste("ERROR: Problems with allele frequencies in locus", 
@@ -162,7 +162,7 @@ FamiliasPosterior <- function (pedigrees, loci, datamatrix, prior, ref = 1, kins
                 i$locusname))
     }
     if (dim(datamatrix)[2] != 2 * nloci) 
-        stop("The datamatrix must have two columns for each locus")
+        stop("The datamatrix must have two columns for each locus.")
     for (i in 1:nloci) {
         for (j in 1:npers) {
             A1 <- datamatrix[j, 2 * i - 1]
@@ -184,12 +184,12 @@ FamiliasPosterior <- function (pedigrees, loci, datamatrix, prior, ref = 1, kins
                   1), as.integer(i - 1), as.integer(M1 - 1), 
                   as.integer(M2 - 1), error = integer(1))
                 if (result$error > 0) 
-                  stop("ERROR: Problems with input of marker data")
+                  stop("ERROR: Problems with input of marker data.")
             }
         }
     }
     if (kinship < 0) 
-        stop("ERROR: Kinship cannot be negative")
+        stop("ERROR: Kinship cannot be negative.")
     result <- .C("GetProbabilities", as.double(1), as.integer(-1), 
         as.double(1), as.double(1), as.integer(TRUE), as.double(kinship), 
         redundant = integer(npeds), probabilities = double(npeds), 

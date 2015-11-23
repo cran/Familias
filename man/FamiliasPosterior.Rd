@@ -84,9 +84,9 @@ plot(ped2);title("ped2, i.e., AF is unrelated")
 plot(ped3);title("ped3, i.e., AF is uncle")
 par(mfrow=c(1,1))
 mypedigrees <- list(isFather = ped1, unrelated=ped2, isUncle = ped3)
-locus1 <- FamiliasLocus(frequencies=c(0.1, 0.2, 0.3, 0.4), name="locus1", 
-allelenames= c("A", "B", "C", "D"))
-locus2 <- FamiliasLocus(c(0.2, 0.3, 0.5), "loc2", c(17, 18, 19), femaleMutationRate = 0.05)
+locus1 <- FamiliasLocus(frequencies=c(0.1, 0.2, 0.3, 0.4), 
+allelenames= c("A", "B", "C", "D"), name="locus1")
+locus2 <- FamiliasLocus(c(0.2, 0.3, 0.5), c(17, 18, 19), "loc2", femaleMutationRate = 0.05)
 myloci <- list(locus1, locus2)
 datamatrix <- data.frame(locus1.1=c("A", "A", "A"), locus1.2=c("B", "B", "C"), 
 locus2.1=c(17, 19, 19), locus2.2=c(18, 18, 18))
@@ -116,9 +116,9 @@ ped=as.data.frame(ped)
 ped3.c=ConvertPed(ped,persons)$ped
 mypedigrees <- list(isFather = ped1.c, unrelated=ped2.c, isUncle = ped3.c)
 
-locus1 <- FamiliasLocus(frequencies=c(0.1, 0.2, 0.3, 0.4), name="locus1", 
-allelenames= c("A", "B", "C", "D"))
-locus2 <- FamiliasLocus(c(0.2, 0.3, 0.5), "loc2", c(17, 18, 19), 
+locus1 <- FamiliasLocus(frequencies=c(0.1, 0.2, 0.3, 0.4),
+allelenames= c("A", "B", "C", "D"), name="locus1")
+locus2 <- FamiliasLocus(c(0.2, 0.3, 0.5), c(17, 18, 19), "loc2", 
 femaleMutationRate = 0.05)
 myloci <- list(locus1, locus2)
 datamatrix <- data.frame(locus1.1=c("A", "A", "A"), locus1.2=c("B", "B", "C"), 
@@ -153,9 +153,9 @@ ped=as.data.frame(ped)
 ped3.c=ConvertPed(ped,persons)$ped
 mypedigrees <- list(isFather = ped1.c, unrelated=ped2.c, isUncle = ped3.c)
 
-locus1 <- FamiliasLocus(frequencies=c(0.1, 0.2, 0.3, 0.4), name="locus1", 
-allelenames= c("A", "B", "C", "D"))
-locus2 <- FamiliasLocus(c(0.2, 0.3, 0.5), "loc2", c(17, 18, 19), femaleMutationRate = 0.05)
+locus1 <- FamiliasLocus(frequencies=c(0.1, 0.2, 0.3, 0.4),
+allelenames= c("A", "B", "C", "D"), name="locus1")
+locus2 <- FamiliasLocus(c(0.2, 0.3, 0.5), c(17, 18, 19), "loc2", femaleMutationRate = 0.05)
 myloci <- list(locus1, locus2)
 
 result=FamiliasPosterior(mypedigrees, myloci, datamatrix, ref=2)
@@ -166,9 +166,9 @@ sex <- c("male", "male")
 ped1 <- FamiliasPedigree(id=persons, dadid=c(NA, NA), momid=c(NA, NA), sex=sex)
 ped2 <- FamiliasPedigree(id=persons, dadid=c("AF", NA), momid=c(NA, NA), sex=sex)
 mypedigrees <- list(unrelated = ped1, isFather=ped2)
-locus1 <- FamiliasLocus(c(0.1, 0.2, 0.3, 0.4), "locus1", c("A", "B", "C", "D"),
+locus1 <- FamiliasLocus(c(0.1, 0.2, 0.3, 0.4), c("A", "B", "C", "D"), "locus1", 
    maleMutationModel = "Equal", maleMutationRate = 0.005)
-locus2 <- FamiliasLocus(c(0.2, 0.3, 0.5), "locus2", c(17, 18, 19),
+locus2 <- FamiliasLocus(c(0.2, 0.3, 0.5), c(17, 18, 19), "locus2", 
    maleMutationModel = "Equal", maleMutationRate = 0.005) 
 myloci <- list(locus1, locus2)
 datamatrix <- data.frame(locus1.1=c("A", "A"), locus1.2=c("B", "B"), 
@@ -182,7 +182,7 @@ sex <- c("male", "female", "male")
 ped1 <- FamiliasPedigree(id=persons, dadid=c(NA, NA, NA), momid=c("mother", NA, NA), sex=sex)
 ped2 <- FamiliasPedigree(id=persons, dadid=c("AF", NA, NA), momid=c("mother", NA, NA), sex=sex)
 mypedigrees <- list(unrelated = ped1, isFather=ped2)
-locus1 <- FamiliasLocus(c(0.1, 0.2, 0.3, 0.4), "locus1", c("A", "B", "C", "D"), 
+locus1 <- FamiliasLocus(c(0.1, 0.2, 0.3, 0.4), c("A", "B", "C", "D"), "locus1", 
    maleMutationModel = "Custom", maleMutationMatrix = matrix(
    c(0.99, 0.005, 0.003, 0.002, 
      0.004, 0.99, 0.004, 0.002, 
@@ -209,7 +209,7 @@ ped1=as.data.frame(ped1)
 foo=ConvertPed(ped1,persons)
 ped1.c=foo$ped
 datamatrix=foo$datamatrix
-locus1 <- FamiliasLocus(frequencies=c(0.1, 0.2, 0.3, 0.4), name="locus1", allelenames= 1:4)
+locus1 <- FamiliasLocus(frequencies=c(0.1, 0.2, 0.3, 0.4), allelenames= 1:4, name="locus1")
 FamiliasPosterior(ped1.c, locus1, datamatrix) #likelihood=0.1^2*0.2^2=4e-04
 th=0.03;FamiliasPosterior(ped1.c, locus1, datamatrix,kinship=th) #Formula below
 ((th+(1-th)*0.1)*(1-th)*0.1*(th*0.2+(1-th)*0.2^2))/((1+2*th)*(1+th)) #OK
@@ -231,7 +231,7 @@ ped2=rbind(as.data.frame(AF),as.data.frame(ped2))
 persons <- c("AF","mother", "child","TF")
 ped2.c=ConvertPed(ped2,persons)$ped
 mypedigrees=list(ped1.c,ped2.c)
-locus1 <- FamiliasLocus(frequencies=c(0.1, 0.1,0.75, 0.05), name="locus1", 
-allelenames= c("A","B","C", "silent"))
+locus1 <- FamiliasLocus(frequencies=c(0.1, 0.1,0.75, 0.05),
+allelenames= c("A","B","C", "silent"), name="locus1")
 result=FamiliasPosterior(mypedigrees, locus1, datamatrix, ref=2) #LR=1.36 OK
 }

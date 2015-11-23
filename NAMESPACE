@@ -1,6 +1,8 @@
 useDynLib(Familias)
 import(kinship2)
 import(paramlink)
+import(Rsolnp)
+importFrom("graphics", "plot")
 export(FamiliasLocus)
 export(FamiliasPedigree)
 export(FamiliasPrior)

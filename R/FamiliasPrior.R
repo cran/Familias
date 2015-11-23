@@ -15,7 +15,7 @@ FamiliasPrior <- function (pedigrees, generationsParameter = 1, inbreedingParame
    for (i in pedigrees[-1]) persons <- persons[persons %in% i$id]
    npers <- length(persons)
    if (npers<2) 
-     stop("The function is meaningless unless there are at least two persons common to all pedigrees")
+     stop("The function is meaningless unless there are at least two persons common to all pedigrees.")
 
    indextable <- matrix(0, npers, npeds)
    
@@ -37,7 +37,7 @@ FamiliasPrior <- function (pedigrees, generationsParameter = 1, inbreedingParame
       result <- .C("AddPerson", as.integer(!(firstped$sex[indextable[j,1]]=="female")), 
 		as.integer(-1), as.integer(FALSE), index = integer(1), error = integer(1))
       if (result$error>0) 
-         stop("ERROR: Problems with list of persons common to all pedigrees.\n")	
+         stop("ERROR: Problems with list of persons common to all pedigrees.")	
    }
 
 
@@ -73,7 +73,7 @@ FamiliasPrior <- function (pedigrees, generationsParameter = 1, inbreedingParame
 		   index = integer(1), 
 		   error = integer(1))
       if (result$error>0) 
-         stop("ERROR: Problem adding pedigree.\n")			  
+         stop("ERROR: Problem adding pedigree.")			  
      
          index <- result$index + 1
 
@@ -85,11 +85,11 @@ FamiliasPrior <- function (pedigrees, generationsParameter = 1, inbreedingParame
 		         as.integer(index-1), 
 		         error = integer(1))
             if (result$error==1) 
-               stop(paste("ERROR: Problem in pedigree", index,".\n"))	
+               stop(paste("ERROR: Problem in pedigree", index))	
             else if (result$error==2)
-               stop(paste("ERROR: Problem in pedigree", index,": Illegal relation based on Year-of-birth or is-Child data.\n"))
+               stop(paste("ERROR: Problem in pedigree", index,": Illegal relation based on Year-of-birth or is-Child data."))
             else if (result$error==3)
-               stop(paste("ERROR: Problem in pedigree", index,": Cycle in the pedigree or duplicate parent.\n"))
+               stop(paste("ERROR: Problem in pedigree", index,": Cycle in the pedigree or duplicate parent."))
          }
          if (i$mindex[j]>0) { 
             #AddRelation(neworder[i$mindex[j]], neworder[j], index)
@@ -98,11 +98,11 @@ FamiliasPrior <- function (pedigrees, generationsParameter = 1, inbreedingParame
 		         as.integer(index-1), 
 		         error = integer(1))
             if (result$error==1) 
-               stop(paste("ERROR: Problem in pedigree", index,".\n"))	
+               stop(paste("ERROR: Problem in pedigree", index))	
             else if (result$error==2)
-               stop(paste("ERROR: Problem in pedigree", index,": Illegal relation based on Year-of-birth or is-Child data.\n"))
+               stop(paste("ERROR: Problem in pedigree", index,": Illegal relation based on Year-of-birth or is-Child data."))
             else if (result$error==3)
-               stop(paste("ERROR: Problem in pedigree", index,": Cycle in the pedigree or duplicate parent.\n"))
+               stop(paste("ERROR: Problem in pedigree", index,": Cycle in the pedigree or duplicate parent."))
          }
       }
    }
@@ -110,7 +110,7 @@ FamiliasPrior <- function (pedigrees, generationsParameter = 1, inbreedingParame
    if (missing(maxGenerations)) 
       maxGenerations <- -1 
    if (generationsParameter < 0 | inbreedingParameter < 0 | partnerParameter < 0) 
-      stop("ERROR: The parameters cannot be negative.\n")
+      stop("ERROR: The parameters cannot be negative.")
    result <- .C("GetProbabilities", 
        	  as.double(generationsParameter), 
           as.integer(maxGenerations), 
@@ -123,11 +123,11 @@ FamiliasPrior <- function (pedigrees, generationsParameter = 1, inbreedingParame
 	  likelihoods = double(0), 
 	  error = integer(1))
    if (result$error==1) 
-      stop("ERROR: Wrong input.\n")
+      stop("ERROR: Wrong input.")
    if (result$error==2)
-      stop("ERROR: All pedigrees have probability zero.\n")
+      stop("ERROR: All pedigrees have probability zero.")
    if (any(result$redundant))
-      stop("Error: some pedigrees are duplicate, remove duplicates")
+      stop("Error: some pedigrees are duplicate, remove duplicates.")
 
    #NewFamilias()
    .C("NewFamilias")
