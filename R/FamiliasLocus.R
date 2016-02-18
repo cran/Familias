@@ -246,25 +246,45 @@ FamiliasLocus <- function (frequencies, allelenames, name,
                               all(femaleMutationMatrix[nAlleles,1:nAll]==0)) {
             res <- stabilize(femaleMutationMatrix[1:nAll,1:nAll], frequencies[1:nAll]/sum(frequencies[1:nAll]), 
                              Stabilization, MaxStabilizedMutrate) 
-            print(paste("Female mutation matrix f ratio:", res$fratio))
-            print(paste("Female mutation matrix max specific mutation rate:", res$maxrate))
-            femaleMutationMatrix[1:nAll,1:nAll] <- res$stabilized
+            if (res$error!="") {
+                print(paste("WARNING:", res$error))
+                print("WARNING: Female mutation matrix not stabilized.")
+            } else {
+                print(paste("Female mutation matrix f ratio:", res$fratio))
+                print(paste("Female mutation matrix max specific mutation rate:", 1-res$mindiag))
+                femaleMutationMatrix[1:nAll,1:nAll] <- res$stabilized
+            }
             res <- stabilize(maleMutationMatrix[1:nAll,1:nAll], frequencies[1:nAll]/sum(frequencies[1:nAll]), 
                              Stabilization, MaxStabilizedMutrate) 
-            print(paste("Male mutation matrix f ratio:", res$fratio))
-            print(paste("Male mutation matrix max specific mutation rate:", res$maxrate))
-            maleMutationMatrix[1:nAll,1:nAll] <- res$stabilized
+            if (res$error!="") {
+                print(paste("WARNING:", res$error))
+                print("WARNING: Male mutation matrix not stabilized.")
+            } else {
+                print(paste("Male mutation matrix f ratio:", res$fratio))
+                print(paste("Male mutation matrix max specific mutation rate:", 1-res$mindiag))
+                maleMutationMatrix[1:nAll,1:nAll] <- res$stabilized
+            }
         } else {
             res <- stabilize(femaleMutationMatrix, frequencies, 
                              Stabilization, MaxStabilizedMutrate) 
-            print(paste("Female mutation matrix f ratio:", res$fratio))
-            print(paste("Female mutation matrix max specific mutation rate:", res$maxrate))
-            femaleMutationMatrix <- res$stabilized
+            if (res$error!="") {
+                print(paste("WARNING:", res$error))
+                print("WARNING: Female mutation matrix not stabilized.")
+            } else {
+                print(paste("Female mutation matrix f ratio:", res$fratio))
+                print(paste("Female mutation matrix max specific mutation rate:", 1-res$mindiag))
+                femaleMutationMatrix <- res$stabilized
+            }
             res <- stabilize(maleMutationMatrix, frequencies, 
                              Stabilization, MaxStabilizedMutrate) 
-            print(paste("Male mutation matrix f ratio:", res$fratio))
-            print(paste("Male mutation matrix max specific mutation rate:", res$maxrate))
-            maleMutationMatrix <- res$stabilized
+            if (res$error!="") {
+                print(paste("WARNING:", res$error))
+                print("WARNING: Male mutation matrix not stabilized.")
+            } else {
+                print(paste("Male mutation matrix f ratio:", res$fratio))
+                print(paste("Male mutation matrix max specific mutation rate:", 1-res$mindiag))
+                maleMutationMatrix <- res$stabilized
+            }
         }
     }
     rownames(femaleMutationMatrix) <- names(frequencies)
@@ -291,46 +311,45 @@ FamiliasLocus <- function (frequencies, allelenames, name,
     result
 }
 
-stabilize <- function(M,pe,stabilizationMethod="DP",t=1){
+stabilize = function(M,pe,stabilizationMethod="DP",t=1){
   #library('Rsolnp')
   R = 1-sum(diag(M)*pe)
   n = dim(M)[1]
   m = n^2
   xM = as.vector(M)
   tol = 1e-10
-  if (all(abs(M - diag(n))<tol)) {
-    P = M
-  } else if (stabilizationMethod == "DP"){
-    if (any(xM==0))
-      stop("DP stabilization not possible unless all mutation matrix elements are positive.") 
-    C = matrix(0,3*n-1,m)
-    for (i in 1:n){
-      C[seq(1,n),seq(n*(i-1)+1,n*i)] = diag(n)
-      C[n+i,seq(n*(i-1)+1,n*i)] = pe
-      C[2*n,seq(n*(n-1)+1,m)] = 0
-      C[2*n+i-1,n*(i-1)+i] = 1
+  if (all(M==diag(n))) 
+     return(list(stabilized = M, fratio=1, mindiag=min(diag(M)), error=""))
+  if (any(M==0))
+     return(list(stabilized = M, fratio=1, mindiag=min(diag(M)), error="Cannot stabilize non-identity matrices with zero entries."))
+  if (stabilizationMethod == "DP"){
+    if (2*max(pe*(1-diag(M))) > sum(pe*(1-diag(M)))){
+      return(list(stabilized=M,fratio=1,mindiag=min(diag(M)),error="DP stabilization doesn't exist."))
     }
-    b = c(rep(1,n),pe[-n],diag(M))
-    xP0 = solnp(pars=xM,
-                fun=function(x) max(sum(x/xM),sum(xM/x)),
-                eqfun = function(x) C%*%x,
-                eqB=b,
-                LB=rep(0,m),
-                UB=rep(1,m),
-                control=list("trace"=FALSE))
-    xP = solnp(pars=xP0$pars,
-               fun=function(x) max(abs(log(x)-log(xM))),
-               eqfun=function(x) C%*%x,
-               eqB=b,
-               LB=rep(0,m),
-               UB=rep(1,m),
-               control=list("trace"=FALSE))
-    if (xP$convergence!=0)
-      warning("The optimization algorithm has not converged.")
-    P = matrix(xP$pars,n,n)
+    if (n>30)
+      print("NOTE: Stabilization comuptations may take long time for large systems.")
+    pnew = pKCompute(pe,diag(M))
+    P0 = (diag(n)-diag(diag(M)))%*%diag(1/(1-pnew))%*%(outer(rep(1,n),pnew)-diag(pnew)) + diag(diag(M))
+    P = theOpting(M,P0,pe)
+    if (max(abs(pe%*%P-pe))>tol){
+      return(list(error="The proposed stabilization doesn't have the desired stationary distribution."))
+    }
+    if (max(abs(P%*%rep(1,n)-rep(1,n)))>tol){
+      return(list(error="The proposed stabilization isn't a proper mutation matrix."))
+    }
+    if (min(P)<0){
+      return(list(error="The proposed stabilization has negative elements."))
+    } else if (min(P)<tol){
+      print("WARNING: The proposed stabilization has very small elements.")
+    }
+    fratio = max(max(P/M),max(M/P))
+    minS = min(diag(P))
+    return(list(stabilized=P,fratio=fratio,mindiag=minS,error=""))
   } else if (stabilizationMethod == "RM"){
-    if (any(xM==0))
-      stop("RM stabilization not possible unless all mutation matrix elements are positive.") 
+    if (t<R+tol | t>1) 
+      return(list(error="MaxStabilizedMutrate parameter out of bounds."))
+    if (n>30)
+      print("NOTE: Stabilization comuptations may take long time for large systems.")
     C = matrix(0,2*n,m)
     for (i in 1:n){
       C[seq(1,n),seq(n*(i-1)+1,n*i)] = diag(n)
@@ -353,36 +372,225 @@ stabilize <- function(M,pe,stabilizationMethod="DP",t=1){
                LB=as.vector((1-t)*diag(n)),
                UB=rep(1,m),
                control=list("trace"=FALSE))
-    if (xP$convergence!=0)
-      warning("The optimization algorithm has not converged")  
-    P = matrix(xP$pars,n,n)
+    P0 = matrix(xP$pars,n,n)
+    P = theOptingRM(M,P0,pe,t)
+    if (max(abs(pe%*%P-pe))>tol){
+      warning("The proposed stabilization doesn't have the desired stationary distribution.")
+    }
+    if (max(abs(P%*%rep(1,n)-rep(1,n)))>tol){
+      warning("The proposed stabilization isn't a proper mutation matrix.")
+    }
+    if (min(P)<0){
+      stop("The proposed stabilization has negative elements.")
+    } else if (min(P)<tol){
+      warning("The proposed stabilization has very small elements.")
+    }
+    fratio = max(max(P/M),max(M/P))
+    minS = min(diag(P))
+    return(list(stabilized=P,fratio=fratio,mindiag=minS,error=""))
   } else if (stabilizationMethod == "PM"){
     # No optimization needed here, the stabilization is unique (if it exists).
-    v <- eigen(t(M))$vectors[,1]
-    v <- v/sum(v)
-    if (sum(diag(M)*v)<1) 
-       d = R*v/((1-sum(diag(M)*v))*pe)
-    else 
-       d <- rep(1, n)
-    if (any(d*(1-diag(M))>t)){
-      stop("PM stabilization doesn't exist for these input parameters.")
-    }
-    P = diag(d)%*%(M-diag(n)) + diag(n)    
-  } else 
+    X = t(M)-diag(n)
+      X[n,] = rep(1,n)
+      v = solve(X,c(rep(0,n-1),1))
+      d = R*v/((1-sum(diag(M)*v))*pe)
+      if (any(d*(1-diag(M))>t)){
+        return(list(statbilized=M,fratio=1,mindiag=min(diag(M)),error="PM stabilization doesn't exist."))
+      }
+      P = diag(d)%*%(M-diag(n)) + diag(n)
+    fratio = max(max(P/M),max(M/P))
+    minS = min(diag(P))
+    return(list(stabilized=P,fratio=fratio,mindiag=minS,error=""))
+  } else {
     stop("Stabilization method must be either \"DP\",\"RM\" or \"PM\".")
-
-  if (max(abs(pe%*%P-pe))>tol){
-    stop("The proposed stabilization doesn't have the desired stationary distribution.")
   }
-  if (max(abs(P%*%rep(1,n)-rep(1,n)))>tol){
-    stop("The proposed stabilization isn't a mutation matrix.")
-  }
-  if (min(P)<0){
-    stop("The proposed stabilization has negative elements.")
-  } 
+}
 
-  fratio = max(max(P[M>0]/M[M>0]),max(M[M>0]/P[M>0]))
-  maxrate = 1 - min(diag(P))
-  return(list(stabilized=P,fratio=fratio,maxrate=maxrate))  
+pKCompute = function(paj,d){
+  # Input paj is the desired stationary distribution and d is a vector
+  # with the desired diagonal elements.
+  # Output should be a probability vector p satisfying
+  # p*(I-D(p)) = K*pie*(I-D(d)).
+
+  paj = as.vector(paj)
+  n = length(paj)
+  
+  w = paj*(1-d)
+  if (2*max(w) > sum(w)){
+    stop('Task impossible with this input')
+  }
+  
+  ord = rev(order(w))
+  Perm = matrix(0,n,n)
+  for (i in 1:n){
+    Perm[i,ord[i]] = 1
+  }
+  w = Perm%*%w
+  
+  eps = 1e-5
+  p = rep(0,n)
+  Kmax = 0.25/w[1]
+  ffun = function (x) 0.5*sum(1-sqrt(1-4*x*w))-1
+  gfun = function (x) ffun(x)+sqrt(1-4*x*w[1])
+  if (ffun(Kmax)>0){
+    K = uniroot(ffun,c(0,Kmax))$root
+    p = 0.5*(1-sqrt(1-4*K*w))
+  } else {
+    while (gfun(eps)<0){
+      eps = eps/2
+    }
+    K = uniroot(gfun,c(eps,Kmax))$root
+    p[1] = 0.5*(1+sqrt(1-4*K*w[1]))
+    p[-1] = 0.5*(1-sqrt(1-4*K*w[-1]))
+  }
+  
+  p = t(Perm)%*%p
+  p = as.vector(p)
+  return(p)
+  
+}
+
+fratio = function(A,B){
+  max(max(A/B),max(B/A))
+}
+
+SgivenMopt = function(M,S0,p){
+  
+  n1 = dim(M)[1]
+  n2 = dim(M)[2]
+  n3 = length(p)
+  if ( (n1!=n2) || (n1!=n3) ){
+    stop('matrix and/or vector dimensions don\'t agree')
+  }
+  
+  n = n1
+  tolerance = 1e-10
+  factorTolerance = 1
+  steg = 1e-2
+  S = S0
+  best = fratio(M,S)
+  change = FALSE
+  if (max(M/S0) >= max(S0/M)){
+    ii = which(M/S0 == best) %% n
+    jj = ceiling(which(M/S0 == best)/n)
+  } else {
+    ii = which(S0/M == best) %% n
+    jj = ceiling(which(S0/M == best)/n)
+    steg = -steg
+  }
+  for (ki in 1:length(ii)){
+    i = ii[ki]
+    if (i==0) i=n
+    for (kj in 1:length(jj)){
+      j = jj[kj]
+      if (j==0) j=n
+      if (j==i) next
+      for (i1 in 1:n){
+        if ( (i1 == i) || (i1 == j) ) next
+        for (j1 in 1:n){
+          if ( (j1 == i) || (j1 == i1) || (j1 == j) ) next
+          while (TRUE){
+            Stemp = S
+            Stemp[i,j] = (1+steg)*S[i,j]
+            Stemp[i,j1] = S[i,j] + S[i,j1] - Stemp[i,j]
+            Stemp[i1,j] = (S[i,j]*p[i] + S[i1,j]*p[i1] - Stemp[i,j]*p[i])/p[i1]
+            Stemp[i1,j1] = S[i1,j] + S[i1,j1] - Stemp[i1,j]
+            f1 = fratio(M[c(i,i1),c(j,j1)],Stemp[c(i,i1),c(j,j1)])
+            f2 = fratio(M[c(i,i1),c(j,j1)],S[c(i,i1),c(j,j1)])
+            if ( (min(Stemp)>0) && (f1-f2 < 0) ){
+              change = TRUE
+              S = Stemp
+              best = fratio(M,S)
+            } else {
+              break
+            }
+          }
+        }
+      }
+    }
+  }
+  ut = list(newS=S,changed=change)
+  return(ut)
+}
+
+SgivenMoptRM = function(M,S0,p,t){
+  
+  n1 = dim(M)[1]
+  n2 = dim(M)[2]
+  n3 = length(p)
+  if ( (n1!=n2) || (n1!=n3) ){
+    stop('matrix and/or vector dimensions don\'t agree')
+  }
+  
+  n = n1
+  tolerance = 1e-10
+  factorTolerance = 1
+  steg = 1e-3
+  S = S0
+  best = fratio(M,S)
+  change = FALSE
+  if (max(M/S0) >= max(S0/M)){
+    ii = which(M/S0 == best) %% n
+    jj = ceiling(which(M/S0 == best)/n)
+  } else {
+    ii = which(S0/M == best) %% n
+    jj = ceiling(which(S0/M == best)/n)
+    steg = -steg
+  }
+  for (ki in 1:length(ii)){
+    i = ii[ki]
+    if (i==0) i=n
+    for (kj in 1:length(jj)){
+      j = jj[kj]
+      if (j==0) j=n
+      for (i1 in 1:n){
+        if (i1 == i) next
+        for (j1 in 1:n){
+          if (j1 == j) next
+          while (TRUE){
+            Stemp = S
+            Stemp[i,j] = (1+steg)*S[i,j]
+            Stemp[i,j1] = S[i,j] + S[i,j1] - Stemp[i,j]
+            Stemp[i1,j] = (S[i,j]*p[i] + S[i1,j]*p[i1] - Stemp[i,j]*p[i])/p[i1]
+            Stemp[i1,j1] = S[i1,j] + S[i1,j1] - Stemp[i1,j]
+            f1 = fratio(M[c(i,i1),c(j,j1)],Stemp[c(i,i1),c(j,j1)])
+            f2 = fratio(M[c(i,i1),c(j,j1)],S[c(i,i1),c(j,j1)])
+            if ( (min(diag(Stemp))>1-t) && (min(Stemp)>0) && (f1-f2 < 0) ){
+              change = TRUE
+              S = Stemp
+              best = fratio(M,S)
+            } else {
+              break
+            }
+          }
+        }
+      }
+    }
+  }
+  return(list(newS=S,changed=change))
+}
+
+theOpting = function(M,S,p){
+  
+  go = TRUE
+  while(go){
+    aRun = SgivenMopt(M,S,p)
+    S = aRun$newS
+    go = aRun$changed
+    #print(fratio(M,S))
+  }
+  return(S)
+}
+
+theOptingRM = function(M,S,p,t){
+  
+  go = TRUE
+  while(go){
+    aRun = SgivenMoptRM(M,S,p,t)
+    S = aRun$newS
+    go = aRun$changed
+    #print(fratio(M,S))
+  }
+  return(S)
 }
 
