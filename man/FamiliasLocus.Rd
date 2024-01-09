@@ -2,32 +2,34 @@
 \alias{FamiliasLocus}
 
 \title{
-Creates an object with information on a locus, including its mutation matrices. 
+Creates an object with information on a locus, including its mutation matrices 
 }
 \description{
-The user provides input needed to define a locus (also called system or forensic marker) to be used for pedigree calculations.
+The user provides input needed to define an autosomal locus (also called system or forensic marker) to be used for pedigree calculations.
 The input is checked and if no errors are found a list with class \code{FamiliasLocus} is returned containing
 the information.
 }
 \usage{
-FamiliasLocus(frequencies, allelenames, name, 
-			   MutationModel = "Stepwise", 
-                           MutationRate  = 0, 
-                           MutationRange = 0.5, 
-                           MutationRate2 = 0, 
-			   MutationMatrix, 
-			   Stabilization = "None", 
-			   MaxStabilizedMutrate = 1, 
-			   femaleMutationModel, 
-			   femaleMutationRate, 
-			   femaleMutationRange, 
-			   femaleMutationRate2, 
-			   femaleMutationMatrix, 
-			   maleMutationModel, 
-			   maleMutationRate, 
-			   maleMutationRange, 
-			   maleMutationRate2, 
-			   maleMutationMatrix)
+FamiliasLocus(frequencies, 
+              allelenames, 
+              name, 
+              MutationModel = "Stepwise", 
+              MutationRate  = 0, 
+              MutationRange = 0.5, 
+              MutationRate2 = 0, 
+              MutationMatrix, 
+              Stabilization = "None", 
+              MaxStabilizedMutrate = 1, 
+              femaleMutationModel, 
+              femaleMutationRate, 
+              femaleMutationRange, 
+              femaleMutationRate2, 
+              femaleMutationMatrix, 
+              maleMutationModel, 
+              maleMutationRate, 
+              maleMutationRange, 
+              maleMutationRate2, 
+              maleMutationMatrix)
 }
 
 \arguments{
@@ -41,7 +43,7 @@ be non-missing, and new mutation matrices will be constructed based on these. If
 mutation matrices will be produced based on the mutation matrices of the old object. 
 }
   \item{allelenames}{
-Names of the alleles, like \code{15} or 'A'. Note that thel last allele may be called 'Silent' (or 'silent'). 
+Names of the alleles, like \code{15} or 'A'. Note that the last allele may be called 'Silent' (or 'silent'). 
 It is then treated as a silent allele in subsequent likelihood calculations. The default is to use the names attribute of 
 the frequencies, if it exists; otherwise the default is to use consecutive integers, starting at 1.
 Note that if the 'Stepwise' mutation model is used, allele names (except for a silent allele) must be integers, 
@@ -123,10 +125,12 @@ indicating the number of sequence repetitions of an STR marker, or decimal numbe
 indicating a microvariant. Mutations are then divided into two types: Those that 
 add or subtract an integer to the allele, and those that add or subtract some fractional amount. 
 The rate of these two types of mutations are given separately as MutationRate and MutationRate2, respectively. 
-Relative probabilities of different mutaitons of the first type are specified using the MutationRange parameter. 
+Relative probabilities of different mutatitons of the first type are specified using the MutationRange parameter. 
 The model with only integer alleles is referred to as 'Probability decreasing with range (equal)' in Familias 2.0, 
 while the more general model is called 'Extended stepwise' in Familias 3.0. 
 Note that the probability of mutations to or from silent alleles is set to zero in all models except the 'Custom' model. 
+For the mutation matrix of the 'Custom' model, the row names and column names of the matrix must coincide and be equally sorted.
+Furthermore, the allele names must be the same as the row names (and hence column names) of the mutation matrix and be equally sorted.
 
 The 'Stabilization' parameter may be used to change the mutation matrices so that they become stationary relative
 to the frequencies vector. See the references. 
@@ -136,7 +140,7 @@ and all allele names are integers, the resulting model is referred to as
 }
 \value{
 A list of class \code{FamiliasLocus} containing 
-\item{locusname}{The name of the locus}
+\item{locusname}{The name of the locus.}
 \item{alleles}{The frequencies of the alleles. The names of the alleles are included as the vector names.}
 \item{femaleMutationType}{A string specifying the type of the female mutations.}
 \item{femaleMutationMatrix}{The mutation matrix used for female transfer.}
@@ -147,34 +151,34 @@ allele is always independent of which allele the mutation happens from.
 If this is true, some likelihood computations can be done faster.}
 \item{Stabilization}{The stabilization method used.}
 }
-\author{
-Petter Mostad mostad@chalmers.se, Thore Egeland Thore.Egeland@gmail.com, and Ivar Simonsson Ivar simonssi@chalmers.se 
-}
+
 \references{
-Egeland, Kling, Mostad: Relationship Inference with Familias and R. 2016. 
-Simonsson, Mostad: Stationary Mutation models. (Submitted)
+Egeland, Kling, Mostad: Relationship Inference with Familias and R.
+(Academic press, 2016, \url{https://www.familias.name/book.html}).
+Simonsson, Mostad: Stationary Mutation models (FSI: Genetics, 2016).
 }
 
 \examples{
 #Simple examples
 FamiliasLocus(1:4/10)
-FamiliasLocus(frequencies=c(0.1, 0.2, 0.3, 0.4),
-allelenames= c("A", "B", "C", "D"), name="locus1")
+FamiliasLocus(frequencies = c(0.1, 0.2, 0.3, 0.4),
+allelenames = c("A", "B", "C", "D"), name = "locus1")
 
 #Modified to include a silent frequency
-FamiliasLocus(frequencies=c(0.1, 0.2, 0.3, 0.3, 0.1),
-allelenames= c("8", "9", "10", "11", "silent"), name="locus1")
+FamiliasLocus(frequencies = c(0.1, 0.2, 0.3, 0.3, 0.1),
+allelenames = c("8", "9", "10", "11", "silent"), name = "locus1")
 
 #Mutation rates added
-FamiliasLocus(frequencies=c(0.1, 0.2, 0.3, 0.4),
-allelenames= c("8", "9", "10", "11"), name="locus1", 
-femaleMutationRate=0.001, maleMutationRate=0.005)
+FamiliasLocus(frequencies = c(0.1, 0.2, 0.3, 0.4),
+allelenames = c("8", "9", "10", "11"), name = "locus1", 
+femaleMutationRate = 0.001, maleMutationRate = 0.005)
 
 #Mutation matrices specified directly 
 MM <- matrix(c(0.99, 0.005, 0.003, 0.002, 0.005, 0.99, 0.005, 0, 
-0, 0.005, 0.99, 0.005, 0.002, 0.003, 0.005, 0.99), 4, 4, byrow=TRUE)
-FamiliasLocus(frequencies=c(0.1, 0.2, 0.3, 0.4), 
-allelenames= c("08", "09", "10", "11"), name="locus1", 
+               0, 0.005, 0.99, 0.005, 0.002, 0.003, 0.005, 0.99), 
+             ncol = 4, nrow = 4, byrow = TRUE)
+FamiliasLocus(frequencies = c(0.1, 0.2, 0.3, 0.4), 
+allelenames= c("08", "09", "10", "11"), name = "locus1", 
 MutationModel = "Custom", MutationMatrix = MM)
 
 #A locus is first created, and then edited

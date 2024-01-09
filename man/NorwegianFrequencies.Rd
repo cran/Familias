@@ -2,14 +2,14 @@
 \alias{NorwegianFrequencies}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-A list of markers with allele names and frequencies. 
+A list of markers with allele names and frequencies 
 }
 \description{
 The information represents allele frequencies for a range of different markers based on 
 a data base in Norway. 
 }
 \usage{
-NorwegianFrequencies
+data(NorwegianFrequencies)
 }
 %- maybe also 'usage' for other objects documented here.
 \format{
@@ -20,11 +20,10 @@ equal to the names of the alleles.
 \source{
 Norwegian Institute of Public Health, Department of Family Genetics: 
 \cite{Dupuy et al: Frequency data for 35 autosomal STR markers in a Norwegian, an East African, 
-and East Asian and Middle Asian population and simuation of adequate database size. Forensic Science 
+and East Asian and Middle Asian population and simulation of adequate database size. Forensic Science 
 International: Genetics Supplement Series, Volume 4, issue 1, 2013}
 }
 \examples{
-require(Familias)
 data(NorwegianFrequencies)
 
 #Displaying the Norwegian frequencies of the 

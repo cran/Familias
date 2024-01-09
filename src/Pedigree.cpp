@@ -40,10 +40,12 @@ Pedigree::Pedigree(int nNamedPers,
       mother[i] = -1; 
       for (j=0; j<nTotal; j++)
 	 if (par[j+i*nTotal])
+	 {
 	    if (male[j]) 
 	       father[i] = j; 
 	    else 
 	       mother[i] = j; 
+	 }
    }
 }
 
@@ -282,7 +284,7 @@ double* Pedigree::computeProbability(pater& pat,
    for (i=nNamedPersons; i<nTotal; i++)
    {
       names[i] = new char[100]; 
-      sprintf(names[i], "%s%d", namePrefix, i); 
+      snprintf(names[i], 100, "%s%d", namePrefix, i);
       pat.add_person(male[i], newcopy(names[i]), 0, error); 
    }
    //removed 2012-03-16

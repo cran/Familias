@@ -19,7 +19,7 @@ FamiliasLocus <- function (frequencies, allelenames, name,
 {
     if (missing(frequencies)) 
         stop("The first argument must be a list of frequencies or a FamiliasLocus object.")
-    if(class(frequencies)=="FamiliasLocus") {
+    if(inherits(frequencies, "FamiliasLocus")) {
         if (!missing(name) || !missing(allelenames))
             stop("Only mutation parameters can be edited with the FamiliasLocus function.")
         x <- frequencies
@@ -104,6 +104,10 @@ FamiliasLocus <- function (frequencies, allelenames, name,
             stop("The female mutation matrix cannot have negative entries.")
         if (any(round(apply(femaleMutationMatrix, 1, sum), 6) != 1)) 
             stop("The rows in the female mutation matrix must sum to 1.")
+        if(!all(rownames(femaleMutationMatrix) == colnames(femaleMutationMatrix)))
+            stop("Rownames and colnames of mutation matrix must coincide and be equally sorted")
+        if(!all(rownames(femaleMutationMatrix) == allelenames))
+            stop("Dimnames of mutation matrix and allelenames must coincide and be equally sorted")
         femaleMutationType <- "A 'Custom' specified mutation matrix"
     }
     else 
@@ -135,7 +139,7 @@ FamiliasLocus <- function (frequencies, allelenames, name,
                 stop("The 'Stepwise' mutation model requires all non-silent alleles to have numerical names.")
             if (any(round(numfreq, 1)!=numfreq))
                 stop("Microvariants must be named as a decimal number with one decimal.")
-            microgroup <- (numfreq - round(numfreq))*10
+            microgroup <- round((numfreq - round(numfreq))*10) #Bug fixed 2023-10-30
             for (i in 1:nAll) {
                 microcompats <- (microgroup == microgroup[i])
                 for (j in 1:nAll) {
@@ -174,6 +178,10 @@ FamiliasLocus <- function (frequencies, allelenames, name,
             stop("The male mutation matrix cannot have negative entries.")
         if (any(round(apply(maleMutationMatrix, 1, sum), 6) != 1)) 
             stop("The rows in the male mutation matrix must sum to 1.")
+        if(!all(rownames(femaleMutationMatrix) == colnames(femaleMutationMatrix)))
+            stop("Rownames and colnames of mutation matrix must coincide and be equally sorted")
+        if(!all(rownames(femaleMutationMatrix) == allelenames))
+            stop("Dimnames of mutation matrix and allelenames must coincide and be equally sorted")
         maleMutationType <- "A 'Custom' specified mutation matrix"
     }
     else 
@@ -205,7 +213,7 @@ FamiliasLocus <- function (frequencies, allelenames, name,
                 stop("The 'Stepwise' mutation model requires all non-silent alleles to have numerical names.")
             if (any(round(numfreq, 1)!=numfreq))
                 stop("Microvariants must be named as a decimal number with one decimal.")
-            microgroup <- (numfreq - round(numfreq))*10
+            microgroup <- round((numfreq - round(numfreq))*10) # #Bug fixed 2023-10-30
             for (i in 1:nAll) {
                 microcompats <- (microgroup == microgroup[i])
                 for (j in 1:nAll) {
@@ -303,13 +311,32 @@ FamiliasLocus <- function (frequencies, allelenames, name,
         if (any(round(v - v[1], 6) != 0)) 
             simpleMutationMatrices <- FALSE
     }
+    if(nAlleles == 1){
+      femaleMutationMatrix[1,1] = 1
+      maleMutationMatrix[1,1] = 1
+      print("Mutation matrices set to 1 with 1 allele")
+      cat("\n")
+    }
     result <- list(locusname = name, alleles = frequencies, femaleMutationType = femaleMutationType, 
-        femaleMutationMatrix = femaleMutationMatrix, maleMutationType = maleMutationType, 
-        maleMutationMatrix = maleMutationMatrix, simpleMutationMatrices = simpleMutationMatrices, 
-	Stabilization = Stabilization)
+        femaleMutationMatrix = validateMutation(femaleMutationMatrix), maleMutationType = maleMutationType, 
+        maleMutationMatrix = validateMutation(maleMutationMatrix), simpleMutationMatrices = simpleMutationMatrices, 
+        Stabilization = Stabilization)
     class(result) <- "FamiliasLocus"
     result
 }
+
+validateMutation = function(mutmat){
+  if (any(mutmat < 0) || any(mutmat > 1)) 
+    stop(paste("The mutation matrix must have entries in [0,1]"))
+  rs = rowSums(mutmat)
+  if (any(round(rs, 3) != 1)) {
+    print(rowSums(mutmat))
+    stop("Rows which do not sum to 1 (after rounding to 3 decimal places): ", 
+          which(round(rs, 3) != 1))
+  }
+  mutmat
+}
+ 
 
 stabilize = function(M,pe,stabilizationMethod="DP",t=1){
   #library('Rsolnp')
