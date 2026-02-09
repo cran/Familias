@@ -1,7 +1,7 @@
 Type: Package
 Package: Familias
 Title: Probabilities for Pedigrees Given DNA Data
-Version: 2.6.3
+Version: 2.6.4
 Authors@R: c(
     person(given = "Petter",
            family = "Mostad",
@@ -9,8 +9,12 @@ Authors@R: c(
            email = "mostad@chalmers.se"),
     person(given = "Thore",
            family = "Egeland",
-           role = c("aut", "cre"),
+           role = "aut",
            email = "Thore.Egeland@nmbu.no"),
+    person(given = "Franco",
+           family = "Marsico",
+           role = c("aut", "cre"),
+           email = "franco.lmarsico@gmail.com"),
     person(given = "Ivar",
            family = "Simonsson",
            role = "aut",
@@ -26,10 +30,11 @@ Depends: kinship2, R (>= 3.4.0), Rsolnp
 Encoding: UTF-8
 LazyLoad: yes
 NeedsCompilation: yes
-Packaged: 2025-05-12 10:43:33 UTC; theg
+Packaged: 2026-02-07 21:35:51 UTC; franco
 Author: Petter Mostad [aut],
-  Thore Egeland [aut, cre],
+  Thore Egeland [aut],
+  Franco Marsico [aut, cre],
   Ivar Simonsson [aut]
-Maintainer: Thore Egeland <Thore.Egeland@nmbu.no>
+Maintainer: Franco Marsico <franco.lmarsico@gmail.com>
 Repository: CRAN
-Date/Publication: 2025-05-12 11:20:05 UTC
+Date/Publication: 2026-02-09 08:30:02 UTC
